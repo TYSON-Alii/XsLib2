@@ -53,17 +53,17 @@ struct {
 			vex3i Lime			= vex3i(140, 229, 15);
 		} Rgb256;
 		struct {
-			unsigned int Red			= 0xf81d43;
-			unsigned int DarkGreen		= 0x006243;
-			unsigned int Blue			= 0x00b3e9;
-			unsigned int Pink			= 0xffdde3;
-			unsigned int DarkBlue		= 0x5b49e2;
-			unsigned int Grey			= 0x3a3949;
-			unsigned int Purple			= 0x8e0aa5;
-			unsigned int LightPurple	= 0x9270da;
-			unsigned int Orange			= 0xff5b17;
-			unsigned int Yellow			= 0xe8ff35;
-			unsigned int Lime			= 0x8ce50f;
+			int Red			= 0xf81d43;
+			int DarkGreen	= 0x006243;
+			int Blue		= 0x00b3e9;
+			int Pink		= 0xffdde3;
+			int DarkBlue	= 0x5b49e2;
+			int Grey		= 0x3a3949;
+			int Purple		= 0x8e0aa5;
+			int LightPurple	= 0x9270da;
+			int Orange		= 0xff5b17;
+			int Yellow		= 0xe8ff35;
+			int Lime		= 0x8ce50f;
 			struct {
 				strinx Red			= "f81d43";
 				strinx DarkGreen	= "006243";
@@ -78,6 +78,10 @@ struct {
 				strinx Lime			= "8ce50f";
 			} Stx;
 		} Hex;
+		struct {
+			vex3f HexToRGB(int hex) { return vex3f(((hex >> 16) & 0xff) / 255.f, ((hex >> 8) & 0xff) / 255.f, ((hex) & 0xff) / 255.f); };
+			vex3i HexToRGB256(int hex) { return vex3i(((hex >> 16) & 0xff), ((hex >> 8) & 0xff), ((hex) & 0xff)); };
+		} Convert;
 	} Color;
 	struct {
 		typedef unsigned char Key_t;
