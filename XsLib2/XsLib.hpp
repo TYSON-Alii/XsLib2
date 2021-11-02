@@ -28,17 +28,56 @@ struct {
 		};
 	} Log;
 	struct {
-		vex3f Red = vex3f(0.976f, 0.117f, 0.265f);
-		vex3f DarkGreen = (0.000f, 0.386f, 0.265f);
-		vex3f Blue = (0.000f, 0.703f, 0.917f);
-		vex3f Pink = (1.000f, 0.867f, 0.894f);
-		vex3f DarkBlue = (0.359f, 0.289f, 0.890f);
-		vex3f Grey = (0.230f, 0.226f, 0.289f);
-		vex3f Purple = (0.564f, 0.04f, 0.65f);
-		vex3f MediumPurple = (0.576f, 0.439f, 0.858f);
-		vex3f Orange = (1.00f, 0.36f, 0.09f);
-		vex3f Yellow = (0.91f, 1.00f, 0.21f);
-		vex3f Lime = (0.55f, 0.90f, 0.06f);
+		vex3f Red			= vex3f(0.976f, 0.117f, 0.265f);
+		vex3f DarkGreen		= vex3f(0.000f, 0.386f, 0.265f);
+		vex3f Blue			= vex3f(0.000f, 0.703f, 0.917f);
+		vex3f Pink			= vex3f(1.000f, 0.867f, 0.894f);
+		vex3f DarkBlue		= vex3f(0.359f, 0.289f, 0.890f);
+		vex3f Grey			= vex3f(0.230f, 0.226f, 0.289f);
+		vex3f Purple		= vex3f(0.564f, 0.04f, 0.65f);
+		vex3f LightPurple	= vex3f(0.576f, 0.439f, 0.858f);
+		vex3f Orange		= vex3f(1.00f, 0.36f, 0.09f);
+		vex3f Yellow		= vex3f(0.91f, 1.00f, 0.21f);
+		vex3f Lime			= vex3f(0.55f, 0.90f, 0.06f);
+		struct {
+			vex3i Red			= vex3i(248, 29, 67);
+			vex3i DarkGreen		= vex3i(0, 98, 67);
+			vex3i Blue			= vex3i(0, 179, 233);
+			vex3i Pink			= vex3i(255, 221, 227);
+			vex3i DarkBlue		= vex3i(91, 73, 226);
+			vex3i Grey			= vex3i(58, 57, 73);
+			vex3i Purple		= vex3i(143, 10, 165);
+			vex3i LightPurple	= vex3i(146, 112, 218);
+			vex3i Orange		= vex3i(255, 91, 23);
+			vex3i Yellow		= vex3i(232, 255, 53);
+			vex3i Lime			= vex3i(140, 229, 15);
+		} Rgb256;
+		struct {
+			unsigned int Red			= 0xf81d43;
+			unsigned int DarkGreen		= 0x006243;
+			unsigned int Blue			= 0x00b3e9;
+			unsigned int Pink			= 0xffdde3;
+			unsigned int DarkBlue		= 0x5b49e2;
+			unsigned int Grey			= 0x3a3949;
+			unsigned int Purple			= 0x8e0aa5;
+			unsigned int LightPurple	= 0x9270da;
+			unsigned int Orange			= 0xff5b17;
+			unsigned int Yellow			= 0xe8ff35;
+			unsigned int Lime			= 0x8ce50f;
+			struct {
+				strinx Red			= "f81d43";
+				strinx DarkGreen	= "006243";
+				strinx Blue			= "00b3e9";
+				strinx Pink			= "ffdde3";
+				strinx DarkBlue		= "5b49e2";
+				strinx Grey			= "3a3949";
+				strinx Purple		= "8e0aa5";
+				strinx LightPurple	= "9270da";
+				strinx Orange		= "ff5b17";
+				strinx Yellow		= "e8ff35";
+				strinx Lime			= "8ce50f";
+			} Stx;
+		} Hex;
 	} Color;
 	struct {
 		typedef unsigned char Key_t;
