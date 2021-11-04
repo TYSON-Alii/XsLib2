@@ -1,6 +1,10 @@
+#define _XSLIB2_
 #include <utility>
 #include <Windows.h>
 #include <GL/glew.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include "math/Strinx.hpp"
@@ -13,6 +17,7 @@
 #define rep(v) for (decltype(v) i = 0; i < v; i +=1 )
 #define rep(v, j) for (decltype(v) i = 0; i < v; i += j)
 typedef std::vector<GLfloat> XsVertices;
+typedef unsigned int XsTexture;
 struct {
 	strinx LogStx;
 	struct {
@@ -84,64 +89,67 @@ struct {
 		} Convert;
 	} Color;
 	struct {
-		typedef unsigned char Key_t;
-		Key_t A = 65, B = 66, C = 67, D = 68, E = 69, F = 70, G = 71, H = 72, I = 73, J = 74, K = 75, L = 76, M = 77, N = 78, O = 79, P = 80, Q = 81, R = 82, S = 83, T = 84, U = 85, V = 86, W = 87, X = 88, Y = 89, Z = 90;
-		Key_t num0 = 48, num1 = 49, num2 = 50, num3 = 51, num4 = 52, num5 = 53, num6 = 54, num7 = 55, num8 = 56, num9 = 57;
-		Key_t Space = 32;
-		Key_t Escape = 27;
-		Key_t Delete = 8;
-		Key_t Tab = 9;
-		Key_t Up = 38;
-		Key_t Down = 40;
-		Key_t Right = 39;
-		Key_t Left = 37;
-		Key_t Shift = 16;
-		Key_t Enter = 13;
-		Key_t MouseLeft = 1;
-		Key_t MouseRight = 2;
-		Key_t MouseMiddle = 16;
+		enum Key_t {
+			A = 65, B = 66, C = 67, D = 68, E = 69, F = 70, G = 71, H = 72, I = 73, J = 74, K = 75, L = 76, M = 77, N = 78, O = 79, P = 80, Q = 81, R = 82, S = 83, T = 84, U = 85, V = 86, W = 87, X = 88, Y = 89, Z = 90,
+			Num0 = 48, Num1 = 49, Num2 = 50, Num3 = 51, Num4 = 52, Num5 = 53, Num6 = 54, Num7 = 55, Num8 = 56, Num9 = 57,
+			Space = 32,
+			Escape = 27,
+			Delete = 8,
+			Tab = 9,
+			Up = 38,
+			Down = 40,
+			Right = 39,
+			Left = 37,
+			Shift = 16,
+			Enter = 13,
+			MouseLeft = 1,
+			MouseRight = 2,
+			MouseMiddle = 16
+		};
 	} Key;
 	struct {
-		typedef unsigned char Enum_t;
-		Enum_t Point = 0x01;
-		Enum_t Line = 0x02;
-		Enum_t Triangle = 0x03;
-		Enum_t Quad = 0x04;
-		Enum_t Int = 0x05;
-		Enum_t Float = 0x06;
-		Enum_t Double = 0x07;
-		Enum_t Bool = 0x08;
-		Enum_t String = 0x09;
-		Enum_t Char = 0x0a;
-		Enum_t All = 0x0b;
-		Enum_t Vertex = 0x0c;
-		Enum_t Normal = 0x0d;
-		Enum_t Texture = 0x0e;
-		Enum_t VertexAndTexture = 0x0f;
-		Enum_t VertexAndNormal = 0x10;
-		Enum_t Ceil = 0x11;
-		Enum_t Trunc = 0x12;
-		Enum_t Floor = 0x13;
-		Enum_t Repeat = 0x14;
-		Enum_t Reverse = 0x15;
-		Enum_t Smooth = 0x16;
-		Enum_t Hard = 0x17;
+		enum Enum_t {
+			Point = 0x01,
+			Line = 0x02,
+			Triangle = 0x03,
+			Quad = 0x04,
+			Int = 0x05,
+			Float = 0x06,
+			Double = 0x07,
+			Bool = 0x08,
+			String = 0x09,
+			Char = 0x0a,
+			All = 0x0b,
+			Vertex = 0x0c,
+			Normal = 0x0d,
+			Texture = 0x0e,
+			VertexAndTexture = 0x0f,
+			VertexAndNormal = 0x10,
+			Ceil = 0x11,
+			Trunc = 0x12,
+			Floor = 0x13,
+			Repeat = 0x14,
+			Reverse = 0x15,
+			Smooth = 0x16,
+			Hard = 0x17,
+		};
 	} Enum;
 	struct {
-		typedef unsigned char Type_t;
-		Type_t Cube = 0x01;
-		Type_t Prism = 0x02;
-		Type_t Sphere = 0x03;
-		Type_t Cylinder = 0x04;
-		Type_t Cone = 0x05;
-		Type_t Monke = 0x06;
-		Type_t Icosphere = 0x07;
-		Type_t Torus = 0x08;
-		Type_t Square = 0x09;
-		Type_t Teapot = 0x0a;
-		Type_t Star = 0x0b;
-		Type_t Polygone = 0x0c;
-		Type_t Box = 0x0d;
+		enum Solid_t {
+			Cube = 0x01,
+			Prism = 0x02,
+			Sphere = 0x03,
+			Cylinder = 0x04,
+			Cone = 0x05,
+			Monke = 0x06,
+			Icosphere = 0x07,
+			Torus = 0x08,
+			Square = 0x09,
+			Teapot = 0x0a,
+			Star = 0x0b,
+			Polygone = 0x0c,
+			Box = 0x0d
+		};
 	} Solid;
 	struct {
 		struct {
@@ -180,4 +188,103 @@ struct {
 		GetCursorPos(&p);
 		v = vex2<T>(p.x, p.y);
 	};
+	sf::Event Event;
 } Xs;
+void glColor3f(vex3f v) { glColor3f(v.x, v.y, v.z); };
+void glColor3f(vex4f v) { glColor3f(v.x, v.y, v.z); };
+void glColor3i(vex3i v) { glColor3i(v.x, v.y, v.z); };
+void glColor3f(vex2f v, float v1) { glColor3f(v.x, v.y, v1); };
+void glColor3f(float v1, vex2f v) { glColor3f(v1, v.x, v.y); };
+void glColor4f(vex3f v) { glColor4f(v.x, v.y, v.z, 1); };
+void glColor4i(vex3i v) { glColor4i(v.x, v.y, v.z, 1); };
+void glColor4f(vex4f v) { glColor4f(v.x, v.y, v.z, v.w); };
+void glColor4i(vex4i v) { glColor4i(v.x, v.y, v.z, v.w); };
+void glColor4f(vex3f v, float v1) { glColor4f(v.x, v.y, v.z, v1); };
+void glColor4f(float v1, vex3f v) { glColor4f(v1, v.x, v.y, v.z); };
+void glColor4f(vex2f v, float v1, float v2) { glColor4f(v.x, v.y, v1, v2); };
+void glColor4f(float v1, vex2f v, float v2) { glColor4f(v1, v.x, v.y, v2); };
+void glColor4f(float v1, float v2, vex2f v) { glColor4f(v1, v2, v.x, v.y); };
+
+void glTranslatef(vex2f v) { glTranslatef(v.x, v.y, 0); };
+void glTranslatef(vex2f v, float v1) { glTranslatef(v.x, v.y, v1); };
+void glTranslatef(vex3f v) { glTranslatef(v.x, v.y, v.z); };
+void glTranslatef(vex4f v) { glTranslatef(v.x, v.y, v.z); };
+
+void glRotatef(float v1, vex3f v) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(vex3f v, float v1) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(float v1, vex3d v) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(vex3d v, float v1) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(double v1, vex3f v) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(vex3f v, double v1) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(double v1, vex3d v) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(vex3d v, double v1) { glRotatef(v1, v.x, v.y, v.z); };
+void glRotatef(vex3f v) { glRotatef(v.x, 1, 0, 0); glRotatef(v.y, 0, 1, 0); glRotatef(v.z, 0, 0, 1); };
+void glRotatef(vex4f v) { glRotatef(v.w, v.x, v.y, v.z); };
+void glRotatef(vex4d v) { glRotatef(v.w, v.x, v.y, v.z); };
+
+void glScalef(vex2f v) { glScalef(v.x, v.y, 1); };
+void glScalef(vex3f v) { glScalef(v.x, v.y, v.z); };
+void glScalef(vex4f v) { glScalef(v.x, v.y, v.z); };
+void glScalef(vex2d v) { glScalef(v.x, v.y, 1); };
+void glScalef(vex3d v) { glScalef(v.x, v.y, v.z); };
+void glScalef(vex4d v) { glScalef(v.x, v.y, v.z); };
+void glScalef(vex2i v) { glScalef(v.x, v.y, 1); };
+void glScalef(vex3i v) { glScalef(v.x, v.y, v.z); };
+void glScalef(vex4i v) { glScalef(v.x, v.y, v.z); };
+
+void glVertex3f(float v) { glVertex3f(v, v, v); };
+void glVertex3f(double v) { glVertex3f(float(v), float(v), float(v)); };
+void glVertex3f(int v) { glVertex3f(float(v), float(v), float(v)); };
+void glVertex3f(vex2f v) { glVertex3f(v.x, v.y, 0.f); };
+void glVertex3f(vex3f v) { glVertex3f(v.x, v.y, v.z); };
+void glVertex3f(vex4f v) { glVertex3f(v.x, v.y, v.z); };
+void glVertex3f(vex2d v) { glVertex3f(float(v.x), float(v.y), 0.f); };
+void glVertex3f(vex3d v) { glVertex3f(float(v.x), float(v.y), float(v.z)); };
+void glVertex3f(vex4d v) { glVertex3f(float(v.x), float(v.y), float(v.z)); };
+void glVertex3f(vex2i v) { glVertex3f(float(v.x), float(v.y), 0.f); };
+void glVertex3f(vex3i v) { glVertex3f(float(v.x), float(v.y), float(v.z)); };
+void glVertex3f(vex4i v) { glVertex3f(float(v.x), float(v.y), float(v.z)); };
+void glVertex2f(vex2f v) { glVertex2f(v.x, v.y); };
+void glVertex2f(vex3f v) { glVertex2f(v.x, v.y); };
+void glVertex2f(vex4f v) { glVertex2f(v.x, v.y); };
+void glVertex2f(vex2d v) { glVertex2f(float(v.x), float(v.y)); };
+void glVertex2f(vex3d v) { glVertex2f(float(v.x), float(v.y)); };
+void glVertex2f(vex4d v) { glVertex2f(float(v.x), float(v.y)); };
+void glVertex2f(vex2i v) { glVertex2f(float(v.x), float(v.y)); };
+void glVertex2f(vex3i v) { glVertex2f(float(v.x), float(v.y)); };
+void glVertex2f(vex4i v) { glVertex2f(float(v.x), float(v.y)); };
+#include "mesh/XsShape.hpp"
+#include "system/XsCamera.hpp"
+sf::ContextSettings contextSettings;
+
+#define XsStart(_Window, _Name) for(([&]() -> void {										\
+contextSettings.depthBits = 24;																\
+contextSettings.stencilBits = 8;															\
+contextSettings.antialiasingLevel = 0;														\
+contextSettings.majorVersion = 3;															\
+contextSettings.minorVersion = 3;															\
+contextSettings.sRgbCapable = false;														\
+_Window.create(sf::VideoMode(1500, 750), _Name, sf::Style::Default, contextSettings);		\
+glewExperimental = GL_TRUE;																	\
+glewInit();																					\
+glEnable(GL_SCISSOR_TEST);																	\
+glEnable(GL_DEPTH_TEST);																	\
+glEnable(GL_NORMALIZE);																		\
+glDepthFunc(GL_LESS);																		\
+glShadeModel(GL_SMOOTH);																	\
+glBlendFunc(GL_ZERO, GL_SRC_COLOR);															\
+glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);					\
+glBlendEquation(GL_FUNC_ADD);																\
+glLoadIdentity();																			\
+}());																						\
+																							\
+_Window.isOpen() || ([&]() -> bool {														\
+glClearColor(0, 0, 0, 1.0);																	\
+glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);											\
+while (_Window.pollEvent(Xs.Event))															\
+	if (Xs.Event.type == sf::Event::Closed)													\
+		_Window.close();																	\
+return false;																				\
+}());																						\
+																							\
+([&]() -> void { _Window.display(); }()))
