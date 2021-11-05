@@ -8,12 +8,12 @@ public:
 	float fov = 45.0f;
 	float near_ = 0.001f, far_ = 1000.0f;
 	vex2f viewport;
-	glm::mat4 projectionMatrix() { return glm::perspective(fov, (float)viewport.x / (float)viewport.y, near_, far_); };
-	glm::mat4& viewMatrix() { return _viewMatrix; };
+	inline glm::mat4 projectionMatrix() { return glm::perspective(fov, (float)viewport.x / (float)viewport.y, near_, far_); };
+	inline glm::mat4& viewMatrix() { return _viewMatrix; };
 };
 void XsDefaultCamera(XsCamera& cam) {
-	glScissor(0.0f, 0.0f, cam.viewport.x, cam.viewport.y);
-	glViewport(0.0f, 0.0f, (GLsizei)cam.viewport.x, (GLsizei)cam.viewport.y);
+	glScissor(0, 0, cam.viewport.x, cam.viewport.y);
+	glViewport(0, 0, (GLsizei)cam.viewport.x, (GLsizei)cam.viewport.y);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glm::mat4 pmx = glm::perspective(cam.fov, (float)cam.viewport.x / (float)cam.viewport.y, cam.near_, cam.far_);
@@ -34,8 +34,8 @@ void XsDefaultCamera(XsCamera& cam) {
 void XsFPSCamera(XsCamera& cam, vex2f _mouse_pos, float _sensivity) {
 	float _yaw = _mouse_pos.x * _sensivity;
 	float _pitch = (_mouse_pos.y * _sensivity > 89.9f) ? 89.9f : (_mouse_pos.y * _sensivity < -89.9f) ? -89.9f : (_mouse_pos.y * _sensivity);
-	glViewport(0.0f, 0.0f, (GLsizei)cam.viewport.x, (GLsizei)cam.viewport.y);
-	glScissor(0.0f, 0.0f, cam.viewport.x, cam.viewport.y);
+	glViewport(0, 0, (GLsizei)cam.viewport.x, (GLsizei)cam.viewport.y);
+	glScissor(0, 0, cam.viewport.x, cam.viewport.y);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glm::mat4 pmx = glm::perspective(cam.fov, (float)cam.viewport.x / (float)cam.viewport.y, cam.near_, cam.far_);
