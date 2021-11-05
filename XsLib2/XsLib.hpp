@@ -1,6 +1,7 @@
 #define _XSLIB2_
 #include <utility>
 #include <Windows.h>
+#include <fstream>
 #include <GL/glew.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm.hpp>
@@ -10,14 +11,15 @@
 #include "math/Strinx.hpp"
 #include "math/Vex.hpp"
 #include "math/Random.hpp"
+using namespace std::string_literals;
 #define XS_PI 3.141592
 #define XS_HALF_PI 1.570796
 #define XS_TWO_PI 6.283185
 #define XS_FI 1.618033
 #define rep(v) for (decltype(v) i = 0; i < v; i +=1 )
 #define rep(v, j) for (decltype(v) i = 0; i < v; i += j)
-typedef std::vector<GLfloat> XsVertices;
-typedef unsigned int XsTexture;
+typedef std::vector<GLfloat> XsVerts;
+typedef unsigned int XsTexData;
 struct {
 	strinx LogStx;
 	struct {
@@ -27,7 +29,7 @@ struct {
 			Color_t DarkBlue = 1, DarkGreen = 2, DarkCyan = 3, DarkRed = 4, DarkMagenta = 5, DarkYellow = 6, Dark_grey = 8;
 			Color_t Grey = 7, Blue = 9, Green = 10, Cyan = 11, Red = 12, Purple = 13, Yellow = 14;
 		} Color;
-		void operator<<(const char error) {
+		void operator<<(const char* error) {
 			Xs.LogStx += error;
 			Xs.LogStx += '\n';
 		};
@@ -153,13 +155,13 @@ struct {
 	} Solid;
 	struct {
 		struct {
-			XsVertices Default{
+			XsVerts Default{
 				-1.f, -1.f, 0.f,
 				-1.f, 1.f, 0.f,
 				1.f, 1.f, 0.f,
 				1.f, -1.f, 0.f
 			};
-			XsVertices Textured{
+			XsVerts Textured{
 				-1.f, -1.f, 0.f,  0.f, 0.f,
 				-1.f, 1.f, 0.f,  0.f, 1.f,
 				1.f, 1.f, 0.f,  1.f, 1.f,
@@ -189,7 +191,13 @@ struct {
 		v = vex2<T>(p.x, p.y);
 	};
 	sf::Event Event;
+	XsVerts LoadOBJ(const char* filename, decltype(Enum)::Enum_t mode);
+	void Draw(XsVerts vert, decltype(Enum)::Enum_t mode, GLenum glmode);
+	bool LoadTexture(const char* filename, unsigned int& _tex_data, GLenum _wrapping, GLenum _filter);
 } Xs;
+typedef decltype(decltype(Xs)::Enum)::Enum_t XsEnum;
+typedef decltype(decltype(Xs)::Key)::Key_t XsKey;
+typedef decltype(decltype(Xs)::Solid)::Solid_t XsSolidType;
 void glColor3f(vex3f v) { glColor3f(v.x, v.y, v.z); };
 void glColor3f(vex4f v) { glColor3f(v.x, v.y, v.z); };
 void glColor3i(vex3i v) { glColor3i(v.x, v.y, v.z); };
@@ -253,8 +261,17 @@ void glVertex2f(vex4d v) { glVertex2f(float(v.x), float(v.y)); };
 void glVertex2f(vex2i v) { glVertex2f(float(v.x), float(v.y)); };
 void glVertex2f(vex3i v) { glVertex2f(float(v.x), float(v.y)); };
 void glVertex2f(vex4i v) { glVertex2f(float(v.x), float(v.y)); };
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb.h"
+#include "stb/stb_image.h"
+#include "system/XsTexture.hpp"
+
 #include "mesh/XsShape.hpp"
+
 #include "system/XsCamera.hpp"
+
+#include "mesh/XsOBJLoader.hpp"
+
 sf::ContextSettings contextSettings;
 
 #define XsStart(_Window, _Name) for(([&]() -> void {										\
@@ -264,7 +281,7 @@ contextSettings.antialiasingLevel = 0;														\
 contextSettings.majorVersion = 3;															\
 contextSettings.minorVersion = 3;															\
 contextSettings.sRgbCapable = false;														\
-_Window.create(sf::VideoMode(1500, 750), _Name, sf::Style::Default, contextSettings);		\
+_Window.create(sf::VideoMode(1200, 750), _Name, sf::Style::Default, contextSettings);		\
 glewExperimental = GL_TRUE;																	\
 glewInit();																					\
 glEnable(GL_SCISSOR_TEST);																	\
@@ -278,13 +295,13 @@ glBlendEquation(GL_FUNC_ADD);																\
 glLoadIdentity();																			\
 }());																						\
 																							\
-_Window.isOpen() || ([&]() -> bool {														\
+([&]() -> bool {																			\
 glClearColor(0, 0, 0, 1.0);																	\
 glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);											\
 while (_Window.pollEvent(Xs.Event))															\
 	if (Xs.Event.type == sf::Event::Closed)													\
 		_Window.close();																	\
 return false;																				\
-}());																						\
+}() || _Window.isOpen());																	\
 																							\
 ([&]() -> void { _Window.display(); }()))
