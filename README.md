@@ -2,7 +2,7 @@
 ```cpp
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include "XsLib2/XsLib.hpp"
+#include <XsLib.hpp>
 
 using namespace std;
 
@@ -21,6 +21,8 @@ int main() {
     XsTexture tex("data/mavi_32x32.png");
 
     XsShape shape;
+    shape.mode = Xs.Enum.VertexAndTexture;
+    shape.glmode = GL_QUADS;
     shape.vert = &magic;
     shape.tex = &tex;
 
@@ -29,16 +31,16 @@ int main() {
             break;
 
         if (Xs.KeyPressed(Xs.Key.W))
-            speed += kameram.rot * 0.02f;
+            speed += kameram.rot * 0.01f;
         else if (Xs.KeyPressed(Xs.Key.S))
-            speed -= kameram.rot * 0.02f;
+            speed -= kameram.rot * 0.01f;
         else if (!Xs.KeyPressed(Xs.Key.S) && !Xs.KeyPressed(Xs.Key.W))
             speed *= 0.95;
         if (Xs.KeyPressed(Xs.Key.Space))
             speed *= 0.75f;
         kameram.pos += speed;
 
-        XsFPSCamera(kameram, Xs.MousePos() - vex2f(0.f, 350.f), 0.3f);
+        XsFPSCamera(kameram, Xs.Mouse.Pos() - vex2f(0.f, 350.f), 0.3f);
 
         shape.draw();
     };
