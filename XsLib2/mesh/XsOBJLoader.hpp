@@ -66,7 +66,7 @@ XsVerts decltype(Xs)::LoadOBJ(const char* filename, XsEnum mode = Xs.Enum.Vertex
 		}
 		_vert.clear();
 		switch (mode) {
-		case Xs.Enum.Vertex:
+		case XsEnum::Vertex:
 			_vert.resize(_vertex_position_indicies.size() * 3, 0);
 			for (size_t i = 0; i < _vertex_position_indicies.size(); i++) {
 				_vert[i * 3] = _vertex_positions[_vertex_position_indicies[i] - 1].x;
@@ -74,7 +74,7 @@ XsVerts decltype(Xs)::LoadOBJ(const char* filename, XsEnum mode = Xs.Enum.Vertex
 				_vert[i * 3 + 2] = _vertex_positions[_vertex_position_indicies[i] - 1].z;
 			}
 			break;
-		case Xs.Enum.VertexAndTexture:
+		case XsEnum::VertexAndTexture:
 			_vert.resize(_vertex_position_indicies.size() * 5, 0);
 			for (size_t i = 0; i < _vertex_position_indicies.size(); i++) {
 				_vert[i * 5] = _vertex_positions[_vertex_position_indicies[i] - 1].x;
@@ -84,7 +84,7 @@ XsVerts decltype(Xs)::LoadOBJ(const char* filename, XsEnum mode = Xs.Enum.Vertex
 				_vert[i * 5 + 4] = _vertex_texcoords[_vertex_texcoord_indicies[i] - 1].y;
 			}
 			break;
-		case Xs.Enum.VertexAndNormal:
+		case XsEnum::VertexAndNormal:
 			_vert.resize(_vertex_position_indicies.size() * 6, 0);
 			for (size_t i = 0; i < _vertex_position_indicies.size(); i++) {
 				_vert[i * 6] = _vertex_positions[_vertex_position_indicies[i] - 1].x;
@@ -95,7 +95,7 @@ XsVerts decltype(Xs)::LoadOBJ(const char* filename, XsEnum mode = Xs.Enum.Vertex
 				_vert[i * 6 + 7] = _vertex_normals[_vertex_normal_indicies[i] - 1].z;
 			}
 			break;
-		case Xs.Enum.All:
+		case XsEnum::All:
 			_vert.resize(_vertex_position_indicies.size() * 8, 0);
 			for (size_t i = 0; i < _vertex_position_indicies.size(); i++) {
 				_vert[i * 8] = _vertex_positions[_vertex_position_indicies[i] - 1].x;
