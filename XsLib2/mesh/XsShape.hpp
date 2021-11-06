@@ -15,7 +15,7 @@ struct XsShape {
 		if (_reset_matrix)
 			glLoadIdentity();
 		if (tex != nullptr)
-			tex->bind();
+			glEnable(GL_TEXTURE_2D), tex->bind();
 		glTranslatef(pos);
 		glRotatef(rot);
 		glScalef(scale);
@@ -23,7 +23,7 @@ struct XsShape {
 			Xs.Draw(*vert, mode, glmode);
 	};
 };
-void decltype(Xs)::Draw(XsVerts vert, XsEnum mode = Xs.Enum.Vertex, GLenum glmode = GL_TRIANGLES) {
+void decltype(Xs)::Draw(XsVerts vert, XsEnum mode, GLenum glmode) {
 	switch (mode) {
 	case XsEnum::Vertex:
 		glEnableClientState(GL_VERTEX_ARRAY);
