@@ -5,26 +5,34 @@
 #include <XsLib.hpp>
 
 using namespace std;
+namespace im = ImGui;
 
 int main() {
-    sf::Window window;
+    sf::RenderWindow window;
     vex3f speed = 0.f;
     XsCamera kameram;
     kameram.fov = 45.0f;
-    kameram.far_ = 1000;
-    kameram.viewport = vex2f(1200, 750);
-    kameram.near_ = 0.01;
-    kameram.pos = vex3f(0, 0, 0);
+    kameram.far_ = 1000.f;
+    kameram.viewport = { 1200, 750 };
+    kameram.near_ = 0.01f;
+    kameram.pos = vex3f(20.f, 20.f, 0.f);
 
+    XsTexture tex("data/mavi_32x32.png");
     XsVerts magic;
     magic = Xs.LoadOBJ("data/cube.obj", Xs.Enum.VertexAndTexture);
-    XsTexture tex("data/mavi_32x32.png");
 
     XsShape shape;
     shape.mode = Xs.Enum.VertexAndTexture;
     shape.glmode = GL_QUADS;
     shape.vert = &magic;
     shape.tex = &tex;
+
+    XsVerts floor_vert;
+    floor_vert = Xs.LoadOBJ("data/plane.obj", Xs.Enum.VertexAndTexture);
+    XsShape floor;
+    floor.mode = Xs.Enum.VertexAndTexture;
+    floor.vert = &floor_vert;
+    floor.tex = &tex;
 
     XsStart(window, "HELLO WORLD !!") {
         if (Xs.KeyPressed(Xs.Key.Escape))
@@ -35,14 +43,20 @@ int main() {
         else if (Xs.KeyPressed(Xs.Key.S))
             speed -= kameram.rot * 0.01f;
         else if (!Xs.KeyPressed(Xs.Key.S) && !Xs.KeyPressed(Xs.Key.W))
-            speed *= 0.95;
+            speed *= 0.95f;
         if (Xs.KeyPressed(Xs.Key.Space))
             speed *= 0.75f;
         kameram.pos += speed;
 
         XsFPSCamera(kameram, Xs.Mouse.Pos() - vex2f(0.f, 350.f), 0.3f);
 
+        floor.draw();
         shape.draw();
+
+        ImBlock(window) {
+            XsInfo(shape, "sahpe");
+            XsInfo(floor, "yre");
+        };
     };
 };
 ```
