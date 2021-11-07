@@ -2,28 +2,35 @@ struct XsShape {
 	XsShape() = default;
 	XsShape(XsVerts& v) { vert = &v; };
 	vex3f pos = 0.f, rot = 0.f, scale = 1.f;
-	vex4f color = vex4f(vex3f(0.f), 1.f);
+	vex4f color = 1.f;
 	XsVerts* vert = nullptr;
 	decltype(Xs.Enum)::Enum_t mode = Xs.Enum.Vertex;
 	GLenum glmode = GL_TRIANGLES;
 	XsTexture* tex = nullptr;
-	inline vex3f& move(float x, float y, float z)	{ return pos += vex3f(x, y, z); };
-	inline vex3f& move(vex4f xyz)					{ return pos += xyz; };
-	inline vex3f& move(vex3f xyz)					{ return pos += xyz; };
-	inline vex3f& move(vex2f xy)					{ return pos += xy; };
+	XsShader* shader = nullptr;
+	inline vex3f& move(float x, float y, float z)			{ return pos += vex3f(x, y, z); };
+	template <typename T> inline vex3f& move(vex4<T> xyz)	{ return pos += xyz;			};
+	template <typename T> inline vex3f& move(vex3<T> xyz)	{ return pos += xyz;			};
+	template <typename T> inline vex3f& move(vex2<T> xy)	{ return pos += xy;				};
 	void draw(const bool _reset_matrix = true) {
 		if (_reset_matrix)
 			glLoadIdentity();
-		if (tex != nullptr)
-			glEnable(GL_TEXTURE_2D), tex->bind();
+		if (shader != nullptr) shader->use();
 		glTranslatef(pos);
 		glRotatef(rot);
 		glScalef(scale);
-		if (vert != nullptr)
+		glColor4f(color);
+		if (vert != nullptr) {
+			if (tex != nullptr)
+				tex->bind();
+			else
+				glBindTexture(GL_TEXTURE_2D, 0);
 			Xs.Draw(*vert, mode, glmode);
+		};
+		if (shader != nullptr) glUseProgram(0);
 	};
 };
-void decltype(Xs)::Draw(XsVerts vert, XsEnum mode, GLenum glmode) {
+void decltype(Xs)::Draw(XsVerts vert, XsEnum mode = Xs.Enum.Vertex, GLenum glmode = GL_TRIANGLES) {
 	switch (mode) {
 	case XsEnum::Vertex:
 		glEnableClientState(GL_VERTEX_ARRAY);
