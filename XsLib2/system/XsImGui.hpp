@@ -207,7 +207,7 @@ void XsInfo(XsTexture& v, const char* name = nullptr) {
 void XsInfo(XsShape& v, const char* name = nullptr) {
 	if (name != nullptr) ImGui::Begin(name);
 	ImGui::DragFloat3("position", v.pos, 0.01f, -FLT_MAX, FLT_MAX);
-	ImGui::DragFloat3("rotation", v.rot, 0.1f, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat3("rotation", v.rot, 0.5f, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat3("scale", v.scale, 0.01f, -FLT_MAX, FLT_MAX);
 	ImGui::ColorPicker4("color", v.color);
 	if (v.tex != nullptr) XsInfo(*v.tex);

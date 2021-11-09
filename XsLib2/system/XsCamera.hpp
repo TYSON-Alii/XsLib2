@@ -1,3 +1,5 @@
+#undef near
+#undef far
 class XsCamera {
 private:
 	glm::mat4 _viewMatrix;
@@ -6,17 +8,32 @@ public:
 	vex3f pos = 0;
 	vex3f rot = 0;
 	float fov = 45.0f;
-	float near_ = 0.001f, far_ = 1000.0f;
+	float near = 0.001f, far = 1000.0f;
 	vex2ui viewport;
-	inline glm::mat4 projectionMatrix() { return glm::perspective(fov, (float)viewport.x / (float)viewport.y, near_, far_); };
+	inline glm::mat4 projectionMatrix() { return glm::perspective(fov, (float)viewport.x / (float)viewport.y, near, far); };
 	inline glm::mat4& viewMatrix() { return _viewMatrix; };
+	operator strinx() {
+		strinx t;
+		t < "[Pos]:      " < (const char*)pos < '\n';
+		t < "[Rot]:      " < (const char*)rot < '\n';
+		t < "[Fov]:      " < fov < '\n';
+		t < "[Near]:     " < near < '\n';
+		t < "[Far]:      " < far < '\n';
+		t < "[ViewPort]: " < (const char*)viewport < '\n';
+		return t;
+	};
+	friend std::ostream& operator<<(std::ostream& os, const XsCamera& v) {
+		auto _v = v;
+		std::cout << strinx(_v);
+		return os;
+	};
 };
 void XsDefaultCamera(XsCamera& cam) {
 	glScissor(0, 0, cam.viewport.x, cam.viewport.y);
 	glViewport(0, 0, cam.viewport.x, cam.viewport.y);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glm::mat4 pmx = glm::perspective(cam.fov, (float)cam.viewport.x / (float)cam.viewport.y, cam.near_, cam.far_);
+	glm::mat4 pmx = glm::perspective(cam.fov, (float)cam.viewport.x / (float)cam.viewport.y, cam.near, cam.far);
 	glm::mat4 tmx = glm::translate(glm::mat4(1.f), glm::vec3(-cam.pos.x, -cam.pos.y + 1, -cam.pos.z));
 	glm::vec3 position = glm::normalize(glm::vec3(0, 1, 0));
 	glm::vec3 t_rot;
@@ -38,7 +55,7 @@ void XsFPSCamera(XsCamera& cam, vex2f _mouse_pos, float _sensivity) {
 	glScissor(0, 0, cam.viewport.x, cam.viewport.y);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glm::mat4 pmx = glm::perspective(cam.fov, (float)cam.viewport.x / (float)cam.viewport.y, cam.near_, cam.far_);
+	glm::mat4 pmx = glm::perspective(cam.fov, (float)cam.viewport.x / (float)cam.viewport.y, cam.near, cam.far);
 	glm::mat4 tmx = glm::translate(glm::mat4(1.f), glm::vec3(-cam.pos.x, -cam.pos.y + 1, -cam.pos.z));
 	glm::vec3 position = glm::normalize(glm::vec3(0, 1, 0));
 	glm::vec3 t_rot = glm::vec3(0, 0, 0);
