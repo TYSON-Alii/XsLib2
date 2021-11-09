@@ -15,9 +15,9 @@ struct XsShape {
 	void draw(const bool _reset_matrix = true) {
 		if (_reset_matrix)
 			glLoadIdentity();
-		if (shader != nullptr) shader->use();
 		glTranslatef(pos);
-		glRotatef(rot);
+		Xs.Math.Limit(rot, 0.f, 360.f);
+		glRotatef(rot/360.f);
 		glScalef(scale);
 		glColor4f(color);
 		if (vert != nullptr) {
@@ -25,9 +25,23 @@ struct XsShape {
 				tex->bind();
 			else
 				glBindTexture(GL_TEXTURE_2D, 0);
+			if (shader != nullptr) shader->use();
 			Xs.Draw(*vert, mode, glmode);
+			if (shader != nullptr) glUseProgram(0);
 		};
-		if (shader != nullptr) glUseProgram(0);
+	};
+	operator strinx() {
+		strinx t;
+		t < "[Pos]:   " < (const char*)pos < '\n';
+		t < "[Rot]:   " < (const char*)rot < '\n';
+		t < "[Scale]: " < (const char*)scale < '\n';
+		t < "[Color]: " < (const char*)color < '\n';
+		return t;
+	};
+	friend std::ostream& operator<<(std::ostream& os, const XsShape& v) {
+		auto _v = v;
+		std::cout << strinx(_v);
+		return os;
 	};
 };
 void decltype(Xs)::Draw(XsVerts vert, XsEnum mode = Xs.Enum.Vertex, GLenum glmode = GL_TRIANGLES) {
