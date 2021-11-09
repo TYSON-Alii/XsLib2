@@ -7,20 +7,22 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include <ImGui/imgui.h>
+#include <ImGui/imgui-SFML.h>
+#include <ImGui/imgui_stdlib.h>
 #include <Strinx.hpp>
 #include <Vex.hpp>
 #include <Random.hpp>
+#include <Utilityx.hpp>
 using namespace std::string_literals;
 #define XS_PI 3.141592
 #define XS_HALF_PI 1.570796
 #define XS_TWO_PI 6.283185
 #define XS_FI 1.618033
-#define rep(v) for (decltype(v) i = 0; i < v; i +=1 )
-#define rep(v, j) for (decltype(v) i = 0; i < v; i += j)
 typedef std::vector<GLfloat> XsVerts;
 typedef unsigned int XsTexData;
-#define XsOnce(v) for (static bool v = true; v; v = false)
 struct {
 	strinx LogStx;
 	struct {
@@ -87,8 +89,8 @@ struct {
 			} Stx;
 		} Hex;
 		struct {
-			vex3f HexToRGB(int hex) { return vex3f(((hex >> 16) & 0xff) / 255.f, ((hex >> 8) & 0xff) / 255.f, ((hex) & 0xff) / 255.f); };
-			vex3i HexToRGB256(int hex) { return vex3i(((hex >> 16) & 0xff), ((hex >> 8) & 0xff), ((hex) & 0xff)); };
+			vex3f HexToRGB(int hex)		{ return vex3f(((hex >> 16) & 0xff) / 255.f, ((hex >> 8) & 0xff) / 255.f, ((hex) & 0xff) / 255.f); };
+			vex3i HexToRGB256(int hex)	{ return vex3i(((hex >> 16) & 0xff), ((hex >> 8) & 0xff), ((hex) & 0xff)); };
 		} Convert;
 	} Color;
 	struct {
@@ -104,10 +106,7 @@ struct {
 			Right = 39,
 			Left = 37,
 			Shift = 16,
-			Enter = 13,
-			MouseLeft = 1,
-			MouseRight = 2,
-			MouseMiddle = 16
+			Enter = 13
 		};
 	} Key;
 	struct {
@@ -169,6 +168,51 @@ struct {
 				1.f, -1.f, 0.f,  1.f, 0.f
 			};
 		} Square;
+		struct {
+			XsVerts Default{
+				-1.f, -1.f, -1.f,
+				-1.f,  1.f, -1.f,
+				-1.f, -1.f,  1.f,
+				-1.f, -1.f,  1.f,
+				-1.f,  1.f, -1.f,
+				-1.f,  1.f,  1.f,
+
+				 1.f, -1.f, -1.f,
+				 1.f,  1.f, -1.f,
+				 1.f, -1.f,  1.f,
+				 1.f, -1.f,  1.f,
+				 1.f,  1.f, -1.f,
+				 1.f,  1.f,  1.f,
+
+				-1.f, -1.f, -1.f,
+				 1.f, -1.f, -1.f,
+				-1.f, -1.f,  1.f,
+				-1.f, -1.f,  1.f,
+				 1.f, -1.f, -1.f,
+				 1.f, -1.f,  1.f,
+
+				-1.f,  1.f, -1.f,
+				 1.f,  1.f, -1.f,
+				-1.f,  1.f,  1.f,
+				-1.f,  1.f,  1.f,
+				 1.f,  1.f, -1.f,
+				 1.f,  1.f,  1.f,
+
+				-1.f, -1.f, -1.f,
+				 1.f, -1.f, -1.f,
+				-1.f,  1.f, -1.f,
+				-1.f,  1.f, -1.f,
+				 1.f, -1.f, -1.f,
+				 1.f,  1.f, -1.f,
+
+				-1.f, -1.f,  1.f,
+				 1.f, -1.f,  1.f,
+				-1.f,  1.f,  1.f,
+				-1.f,  1.f,  1.f,
+				 1.f, -1.f,  1.f,
+				 1.f,  1.f,  1.f
+			};
+		} Cube;
 	} Vert;
 	bool KeyPressed(unsigned char key) { return (GetKeyState(key) & 0x800); };
 	struct {
@@ -192,11 +236,47 @@ struct {
 			GetCursorPos(&p);
 			v = vex2<T>(p.x, p.y);
 		};
+		struct {
+			enum Button_t {
+				Left = 1,
+				Right = 2,
+				Middle = 16
+			};
+		} Button;
 	} Mouse;
+	struct {
+		template <typename T1, typename T2>
+		vex2<T1> Distance(vex2<T1> v1, vex2<T2> v2) { return std::sqrt(std::pow(v1.x-v2.x, 2) + std::pow(v1.y - v2.y, 2)); };
+		template <typename T1, typename T2>
+		vex3<T1> Distance(vex3<T1> v1, vex3<T2> v2) { return std::sqrt(std::pow(v1.x - v2.x, 2) + std::pow(v1.y - v2.y, 2) + std::pow(v1.z - v2.z, 2)); };
+		void Limit(float& v, float limit, float restart_n = 0.f) { if (v > limit) v = restart_n; };
+		//void Limit(float& v, float min, float max) { if (v > max) v = min; else if (v < min) v = max; };
+		void Limit(vex2f& v, vex2f min, vex2f max) {
+			if (v.x > max.x) v.x = min.x; else if (v.x < min.x) v.x = max.x;
+			if (v.y > max.y) v.y = min.y; else if (v.y < min.y) v.y = max.y;
+		};
+		void Limit(vex3f& v, vex3f min, vex3f max) {
+			if (v.x > max.x) v.x = min.x; else if (v.x < min.x) v.x = max.x;
+			if (v.y > max.y) v.y = min.y; else if (v.y < min.y) v.y = max.y;
+			if (v.z > max.z) v.z = min.z; else if (v.z < min.z) v.z = max.z;
+		};
+		void Limit(vex4f& v, vex4f min, vex4f max) {
+			if (v.x > max.x) v.x = min.x; else if (v.x < min.x) v.x = max.x;
+			if (v.y > max.y) v.y = min.y; else if (v.y < min.y) v.y = max.y;
+			if (v.z > max.z) v.z = min.z; else if (v.z < min.z) v.z = max.z;
+			if (v.w > max.w) v.w = min.w; else if (v.w < min.w) v.w = max.w;
+		};
+	} Math;
 	sf::Event Event;
 	XsVerts LoadOBJ(const char* filename, decltype(Enum)::Enum_t mode);
 	void Draw(XsVerts vert, decltype(Enum)::Enum_t mode, GLenum glmode);
 	bool LoadTexture(const char* filename, unsigned int& _tex_data, GLenum _filter);
+	void Line(vex3f v1, vex3f v2) { glVertex3f(v1.x, v1.y, v1.z); glVertex3f(v2.x, v2.y, v2.z); };
+	void Cube(vex3f scale) {};
+	struct {
+		vex3f BackGround = 0.f;
+		vex2ui WindowSize = vex2ui(1200, 700);
+	} Sett;
 } Xs;
 typedef decltype(decltype(Xs)::Enum)::Enum_t XsEnum;
 typedef decltype(decltype(Xs)::Key)::Key_t XsKey;
@@ -240,6 +320,9 @@ template <typename T> inline void glVertex3f(vex4<T> v) { glVertex3f(float(v.x),
 template <typename T> inline void glVertex2f(vex2<T> v) { glVertex2f(float(v.x), float(v.y)); };
 template <typename T> inline void glVertex2f(vex3<T> v) { glVertex2f(float(v.x), float(v.y)); };
 template <typename T> inline void glVertex2f(vex4<T> v) { glVertex2f(float(v.x), float(v.y)); };
+
+#include <system/XsShader.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb.h>
 #include <stb/stb_image.h>
@@ -253,8 +336,11 @@ template <typename T> inline void glVertex2f(vex4<T> v) { glVertex2f(float(v.x),
 
 #include <mesh/XsOBJLoader.hpp>
 
-sf::ContextSettings contextSettings;
-sf::Context context;
+#include <system/XsImgui.hpp>
+
+static sf::ContextSettings contextSettings;
+static sf::Context context;
+static sf::Clock __IMCLOCK__;
 
 #define XsStart(_Window, _Name) for(([&]() -> void {										\
 contextSettings.depthBits = 24;																\
@@ -263,9 +349,11 @@ contextSettings.antialiasingLevel = 0;														\
 contextSettings.majorVersion = 3;															\
 contextSettings.minorVersion = 3;															\
 contextSettings.sRgbCapable = false;														\
-_Window.create(sf::VideoMode(1200, 750), _Name, sf::Style::Default, contextSettings);		\
+_Window.create(sf::VideoMode(Xs.Sett.WindowSize.x, Xs.Sett.WindowSize.y), _Name, sf::Style::Default, contextSettings);\
+ImGui::SFML::Init(_Window);																	\
 glewExperimental = GL_TRUE;																	\
 glewInit();																					\
+glEnable(GL_TEXTURE_2D);																	\
 glEnable(GL_SCISSOR_TEST);																	\
 glEnable(GL_DEPTH_TEST);																	\
 glEnable(GL_NORMALIZE);																		\
@@ -278,12 +366,17 @@ glLoadIdentity();																			\
 }());																						\
 																							\
 ([&]() -> bool {																			\
-glClearColor(0, 0, 0, 1.0);																	\
+glClearColor(Xs.Sett.BackGround.x, Xs.Sett.BackGround.y, Xs.Sett.BackGround.z, 1.0);																	\
 glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);											\
-while (_Window.pollEvent(Xs.Event))															\
+while (_Window.pollEvent(Xs.Event)) {														\
+	ImGui::SFML::ProcessEvent(Xs.Event);													\
 	if (Xs.Event.type == sf::Event::Closed)													\
 		_Window.close();																	\
+};																							\
 return false;																				\
 }() || _Window.isOpen());																	\
 																							\
 ([&]() -> void { _Window.display(); }()))
+
+static bool __FxsIm = true;
+#define ImBlock(_Window) for([&](){ ImGui::SFML::Update(_Window, __IMCLOCK__.restart()); __FxsIm = true; }();__FxsIm;[&](){ _Window.pushGLStates(); ImGui::SFML::Render(_Window); _Window.popGLStates(); __FxsIm = false;}())

@@ -1,4 +1,3 @@
-#define rep(v)		for (decltype(v) i = 0; i < v; i +=1 )
 #define rep(v, j)	for (decltype(v) i = 0; i < v; i += j)
 #define Once(v)		for (static bool v = true; v; v = false)
 #define pass void()
