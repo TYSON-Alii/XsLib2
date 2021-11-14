@@ -14,12 +14,12 @@ public:
 	inline glm::mat4& viewMatrix() { return _viewMatrix; };
 	operator strinx() {
 		strinx t;
-		t < "[Pos]:      " < (const char*)pos < '\n';
-		t < "[Rot]:      " < (const char*)rot < '\n';
+		t < "[Pos]:      " < pos.str(", ", "\n");
+		t < "[Rot]:      " < rot.str(", ", "\n");
 		t < "[Fov]:      " < fov < '\n';
 		t < "[Near]:     " < near < '\n';
 		t < "[Far]:      " < far < '\n';
-		t < "[ViewPort]: " < (const char*)viewport < '\n';
+		t < "[ViewPort]: " < viewport.str(", ", "\n");
 		return t;
 	};
 	friend std::ostream& operator<<(std::ostream& os, const XsCamera& v) {
@@ -72,4 +72,38 @@ void XsFPSCamera(XsCamera& cam, vex2f _mouse_pos, float _sensivity) {
 	cam.rot.z = t_rot.z;
 	glLoadMatrixf(&xs_fullTransform_[0][0]);
 	glMatrixMode(GL_MODELVIEW);
+};
+void XsEditorCamera(XsCamera& cam, const float sensivity = 0.3f) {
+	static vex2f last_mouse_pos = 0.f;
+	static bool mouse_press = false;
+	if (Xs.KeyPressed(Xs.Mouse.Button.Right)) {
+		if (Xs.Event.type == 8) {
+			if		(Xs.Event.mouseWheelScroll.delta == 1)	Xs.Editor.Cam.Speed_v += 0.0001f;
+			else if (Xs.Event.mouseWheelScroll.delta == -1)	Xs.Editor.Cam.Speed_v -= 0.0001f;
+
+			if (Xs.Editor.Cam.Speed_v < 0.0001f) Xs.Editor.Cam.Speed_v = 0.0001f;
+		}
+		if (Xs.KeyPressed(Xs.Key.W) && !Xs.KeyPressed(Xs.Key.Space))
+			Xs.Editor.Cam.Speed += cam.rot * (Xs.Editor.Cam.Speed_v);
+		else if (Xs.KeyPressed(Xs.Key.S) && !Xs.KeyPressed(Xs.Key.Space))
+			Xs.Editor.Cam.Speed -= cam.rot * (Xs.Editor.Cam.Speed_v);
+		const vex2f f_pos = Xs.Mouse.Pos() - last_mouse_pos;
+		const vex2f sm_pos = Xs.Editor.Cam.Rot + f_pos;
+		Xs.Editor.Cam.RotVel = (sm_pos - Xs.Editor.Cam.Rot) / 17.5;
+		last_mouse_pos += Xs.Editor.Cam.RotVel;
+	}
+	else
+		mouse_press = false;
+	if (mouse_press == false) {
+		last_mouse_pos = Xs.Mouse.Pos();
+		mouse_press = true;
+	};
+	if (!Xs.KeyPressed(Xs.Key.S) && !Xs.KeyPressed(Xs.Key.W))
+		Xs.Editor.Cam.Speed *= 0.95;
+	if (Xs.KeyPressed(Xs.Key.Space))
+		Xs.Editor.Cam.Speed *= 0.75f;
+	cam.pos += Xs.Editor.Cam.Speed;
+	Xs.Editor.Cam.RotVel *= 0.88;
+	Xs.Editor.Cam.Rot += Xs.Editor.Cam.RotVel;
+	XsFPSCamera(cam, Xs.Editor.Cam.Rot - vex2f(0, 300), sensivity);
 };

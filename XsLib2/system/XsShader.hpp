@@ -1,7 +1,7 @@
 class XsShader {
 public:
     unsigned int ID;
-    XsShader() { };
+    XsShader() = default;
     XsShader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr) {
         std::string vertexCode;
         std::string fragmentCode;
@@ -161,14 +161,14 @@ private:
             if (!success) {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-            }
+            };
         }
         else {
             glGetProgramiv(shader, GL_LINK_STATUS, &success);
             if (!success) {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
                 std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-            }
-        }
-    }
+            };
+        };
+    };
 };
