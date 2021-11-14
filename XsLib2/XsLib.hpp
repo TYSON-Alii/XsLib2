@@ -342,8 +342,8 @@ template <typename T> inline void glVertex2f(vex4<T> v) { glVertex2f(float(v.x),
 #include <system/XsShader.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb.h>
-#include <stb/stb_image.h>
+#include <librarys/stb.h>
+#include <librarys/stb_image.h>
 #include <mesh/XsTexture.hpp>
 
 #include <mesh/XsShape.hpp>
