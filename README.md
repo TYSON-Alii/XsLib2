@@ -36,6 +36,8 @@ int main() {
     
     Xs.Editor.Cam.Speed_v = 0.03f;
     XsStart(window, "HELLO WORLD !!") {
+        Once(_change_them)
+            im::StyleXsDark();
         if (Xs.KeyPressed(Xs.Key.Escape))
             break;
         kameram.viewport = { window.getSize().x, window.getSize().y };
