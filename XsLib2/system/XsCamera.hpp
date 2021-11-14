@@ -105,5 +105,5 @@ void XsEditorCamera(XsCamera& cam, const float sensivity = 0.3f) {
 	cam.pos += Xs.Editor.Cam.Speed;
 	Xs.Editor.Cam.RotVel *= 0.88;
 	Xs.Editor.Cam.Rot += Xs.Editor.Cam.RotVel;
-	XsFPSCamera(cam, Xs.Editor.Cam.Rot - vex2f(0, 300), sensivity);
+	XsFPSCamera(cam, Xs.Editor.Cam.Rot, sensivity);
 };
