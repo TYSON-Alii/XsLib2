@@ -12,19 +12,23 @@
 #include <ImGui/imgui.h>
 #include <ImGui/imgui-SFML.h>
 #include <ImGui/imgui_stdlib.h>
+#include <librarys/json.hpp>
+#include <librarys/magic_enum.hpp>
 #include <Strinx.hpp>
 #include <Vex.hpp>
 #include <Random.hpp>
 #include <Utilityx.hpp>
 using namespace std::string_literals;
-#define XS_PI 3.141592
-#define XS_HALF_PI 1.570796
-#define XS_TWO_PI 6.283185
-#define XS_FI 1.618033
+using json = nlohmann::json;
+#define XS_PI 3.141592f
+#define XS_HALF_PI 1.570796f
+#define XS_TWO_PI 6.283185f
+#define XS_FI 1.618033f
 typedef std::vector<GLfloat> XsVerts;
 typedef unsigned int XsTexData;
 struct {
 	strinx LogStx;
+	float Fps = 1.0f;
 	struct {
 		struct {
 			typedef unsigned char Color_t;
@@ -249,7 +253,7 @@ struct {
 		vex2<T1> Distance(vex2<T1> v1, vex2<T2> v2) { return std::sqrt(std::pow(v1.x-v2.x, 2) + std::pow(v1.y - v2.y, 2)); };
 		template <typename T1, typename T2>
 		vex3<T1> Distance(vex3<T1> v1, vex3<T2> v2) { return std::sqrt(std::pow(v1.x - v2.x, 2) + std::pow(v1.y - v2.y, 2) + std::pow(v1.z - v2.z, 2)); };
-		void Limit(float& v, float limit, float restart_n = 0.f) { if (v > limit) v = restart_n; };
+		inline void Limit(float& v, float limit, float restart_n = 0.f) { if (v > limit) v = restart_n; };
 		//void Limit(float& v, float min, float max) { if (v > max) v = min; else if (v < min) v = max; };
 		void Limit(vex2f& v, vex2f min, vex2f max) {
 			if (v.x > max.x) v.x = min.x; else if (v.x < min.x) v.x = max.x;
@@ -267,16 +271,30 @@ struct {
 			if (v.w > max.w) v.w = min.w; else if (v.w < min.w) v.w = max.w;
 		};
 	} Math;
+	struct {
+		const char* XsModeNames[4]{ "Vertex", "Vertex and Texture", "Vertex and Normal", "All" };
+		const char* GlModeNames[5]{ "Point", "Line", "Triangle", "Quad", "Polygon"};
+	} Values;
 	sf::Event Event;
 	XsVerts LoadOBJ(const char* filename, decltype(Enum)::Enum_t mode);
 	void Draw(XsVerts vert, decltype(Enum)::Enum_t mode, GLenum glmode);
 	bool LoadTexture(const char* filename, unsigned int& _tex_data, GLenum _filter);
+	void Line(float x1, float y1, float z1, float x2, float y2, float z2) { glVertex3f(x1, y1, z1); glVertex3f(x2, y2, z2); };
 	void Line(vex3f v1, vex3f v2) { glVertex3f(v1.x, v1.y, v1.z); glVertex3f(v2.x, v2.y, v2.z); };
 	void Cube(vex3f scale) {};
 	struct {
 		vex3f BackGround = 0.f;
 		vex2ui WindowSize = vex2ui(1200, 700);
 	} Sett;
+	struct {
+		struct {
+			vex3f Speed = 0.f;
+			vex3f Speed_v = 0.1f;
+			vex2f Rot = 0.f;
+			vex2f RotVel = 0.f;
+		} Cam;
+	} Editor;
+	void Save(const char* filename) { };
 } Xs;
 typedef decltype(decltype(Xs)::Enum)::Enum_t XsEnum;
 typedef decltype(decltype(Xs)::Key)::Key_t XsKey;
@@ -341,7 +359,9 @@ template <typename T> inline void glVertex2f(vex4<T> v) { glVertex2f(float(v.x),
 static sf::ContextSettings contextSettings;
 static sf::Context context;
 static sf::Clock __IMCLOCK__;
+static auto _XS_FPS_START = std::chrono::high_resolution_clock::now();
 
+#if !defined(_XsEngine_)
 #define XsStart(_Window, _Name) for(([&]() -> void {										\
 contextSettings.depthBits = 24;																\
 contextSettings.stencilBits = 8;															\
@@ -366,7 +386,8 @@ glLoadIdentity();																			\
 }());																						\
 																							\
 ([&]() -> bool {																			\
-glClearColor(Xs.Sett.BackGround.x, Xs.Sett.BackGround.y, Xs.Sett.BackGround.z, 1.0);																	\
+_XS_FPS_START = std::chrono::high_resolution_clock::now();									\
+glClearColor(Xs.Sett.BackGround.x, Xs.Sett.BackGround.y, Xs.Sett.BackGround.z, 1.0);		\
 glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);											\
 while (_Window.pollEvent(Xs.Event)) {														\
 	ImGui::SFML::ProcessEvent(Xs.Event);													\
@@ -376,7 +397,12 @@ while (_Window.pollEvent(Xs.Event)) {														\
 return false;																				\
 }() || _Window.isOpen());																	\
 																							\
-([&]() -> void { _Window.display(); }()))
+([&]() -> void { _Window.display(); Xs.Fps = (float)std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - _XS_FPS_START).count(); }()))
+#endif
 
 static bool __FxsIm = true;
 #define ImBlock(_Window) for([&](){ ImGui::SFML::Update(_Window, __IMCLOCK__.restart()); __FxsIm = true; }();__FxsIm;[&](){ _Window.pushGLStates(); ImGui::SFML::Render(_Window); _Window.popGLStates(); __FxsIm = false;}())
+
+#ifdef _XsEngine_
+#include <Engine/XsEngine.hpp>
+#endif
