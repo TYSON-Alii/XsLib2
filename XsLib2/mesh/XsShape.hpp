@@ -1,6 +1,23 @@
 struct XsShape {
 	XsShape() = default;
-	XsShape(XsVerts& v) { vert = &v; };
+	XsShape(const char* loadfrom) {
+		std::ifstream i(loadfrom);
+		if (i.is_open()) {
+			json loadfile;
+			i >> loadfile;
+			pos    = vex3f(float(loadfile["pos"][0]), float(loadfile["pos"][1]), float(loadfile["pos"][2]));
+			rot    = vex3f(float(loadfile["rot"][0]), float(loadfile["rot"][1]), float(loadfile["rot"][2]));
+			scale  = vex3f(float(loadfile["scale"][0]), float(loadfile["scale"][1]), float(loadfile["scale"][2]));
+			origin = vex3f(float(loadfile["origin"][0]), float(loadfile["origin"][1]), float(loadfile["origin"][2]));
+			color  = vex4f(float(loadfile["color"][0]), float(loadfile["color"][1]), float(loadfile["color"][2]), float(loadfile["color"][3]));
+			mode   = loadfile["mode"];
+			glmode = loadfile["glmode"];
+		}
+		else {
+			std::cerr << "Shape Cannot Load.";
+			Xs.Log << "Shape Cannot Load.";
+		};
+	};
 #ifdef _XsEngine_
 	const char* name = nullptr;
 	float lineWidth = 1.f, pointSize = 1.f;
@@ -43,12 +60,28 @@ struct XsShape {
 		else if (glmode == GL_LINES) glLineWidth(1.f);
 #endif
 	};
+	void save(const char* filename) const {
+		json savefile{
+			{"pos",   {pos.x, pos.y, pos.z}					},
+			{"rot",	  {rot.x, rot.y, rot.z}					},
+			{"scale", {scale.x, scale.y, scale.z}			},
+			{"origin",{origin.x, origin.y, origin.z}		},
+			{"color", {color.x, color.y, color.z, color.w}	},
+			{"mode",   mode									},
+			{"glmode", glmode								}
+		};
+		std::ofstream o(filename);
+		o << savefile;
+		o.close();
+	};
 	operator strinx() const {
 		strinx t;
-		t < "[Pos]:   " < pos.str  (", ", "\n");
-		t < "[Rot]:   " < rot.str  (", ", "\n");
-		t < "[Scale]: " < scale.str(", ", "\n");
-		t < "[Color]: " < color.str(", ", "\n");
+		t < "[Pos   ]: " < pos.str  (", ", "\n");
+		t < "[Rot   ]: " < rot.str  (", ", "\n");
+		t < "[Scale ]: " < scale.str(", ", "\n");
+		t < "[Color ]: " < color.str(", ", "\n");
+		t < "[Mode  ]: " < std::string(magic_enum::enum_name(mode)) < "\n";
+		t < "[GLMode]: " < strinx((glmode == GL_POINTS) ? "GL_POINTS" : ((glmode == GL_LINES) ? "GL_LINES" : ((glmode == GL_TRIANGLES) ? "GL_TRIANGLES" : ((glmode == GL_QUADS) ? "GL_QUADS" : ((glmode == GL_POLYGON) ? "GL_POLYGON" : "UNKOWN"))))) < '\n';
 		return t;
 	};
 	friend std::ostream& operator<<(std::ostream& os, const XsShape& v) { return os << strinx(v); };

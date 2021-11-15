@@ -9,12 +9,12 @@ bool decltype(Xs)::LoadTexture(const char* filename, unsigned int& _tex_data, GL
     unsigned char* _data = stbi_load(filename, &_widthh, &_heightt, &_nrChannels, 0);
     if (_data) {
         glTexImage2D(GL_TEXTURE_2D, 0, (_nrChannels == 4) ? GL_RGBA : GL_RGB, _widthh, _heightt, 0, (_nrChannels == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, _data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        //glGenerateMipmap(GL_TEXTURE_2D);
         return true;
     }
     else {
-       std::cout << "Failed to Load \""s + filename + '"' + "Image.\n";
-       Xs.Log << ("Failed to Load \""s + filename + '"' + "Image.\n").c_str();
+       std::cout << "Failed to Load \""s + filename + '"' + " Image.\n";
+       Xs.Log << ("Failed to Load \""s + filename + '"' + " Image.\n").c_str();
        glBindTexture(GL_TEXTURE_2D, 0);
        stbi_image_free(_data);
        return false;
@@ -63,8 +63,8 @@ void XsTexture::load(const char* _file_name) {
         _isl = true;
     }
     else {
-        std::cout << "Failed to Load \""s + fileName + '"' + "Image.\n";
-        Xs.Log << ("Failed to Load \""s + fileName + '"' + "Image.\n").c_str();
+        std::cout << "Failed to Load \""s + fileName + '"' + " Image.\n";
+        Xs.Log << ("Failed to Load \""s + fileName + '"' + " Image.\n").c_str();
     };
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(__data);
@@ -82,12 +82,12 @@ void XsTexture::load() {
     if (__data) {
         _scale = vex2i(_widthh, _heightt);
         glTexImage2D(GL_TEXTURE_2D, 0, (_nrChannels == 4) ? GL_RGBA : GL_RGB, _widthh, _heightt, 0, (_nrChannels == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, __data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        //glGenerateMipmap(GL_TEXTURE_2D);
         _isl = true;
     }
     else {
-        std::cout << "Failed to Load \""s + fileName + '"' + "Image.\n";
-        Xs.Log << ("Failed to Load \""s + fileName + '"' + "Image.\n").c_str();
+        std::cout << "Failed to Load \""s + fileName + '"' + " Image.\n";
+        Xs.Log << ("Failed to Load \""s + fileName + '"' + " Image.\n").c_str();
     };
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(__data);
