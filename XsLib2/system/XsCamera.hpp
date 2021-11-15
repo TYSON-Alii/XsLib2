@@ -2,31 +2,27 @@
 #undef far
 class XsCamera {
 private:
-	glm::mat4 _viewMatrix;
+	glm::mat4 _viewMatrix = glm::mat4(1.f);
 public:
 	XsCamera() = default;
 	vex3f pos = 0;
 	vex3f rot = 0;
 	float fov = 45.0f;
 	float near = 0.001f, far = 1000.0f;
-	vex2ui viewport;
+	vex2ui viewport = Xs.Sett.WindowSize;
 	inline glm::mat4 projectionMatrix() { return glm::perspective(fov, (float)viewport.x / (float)viewport.y, near, far); };
 	inline glm::mat4& viewMatrix() { return _viewMatrix; };
-	operator strinx() {
+	operator strinx() const {
 		strinx t;
-		t < "[Pos]:      " < pos.str(", ", "\n");
-		t < "[Rot]:      " < rot.str(", ", "\n");
-		t < "[Fov]:      " < fov < '\n';
-		t < "[Near]:     " < near < '\n';
-		t < "[Far]:      " < far < '\n';
+		t < "[Pos     ]: " < pos.str(", ", "\n");
+		t < "[Rot     ]: " < rot.str(", ", "\n");
+		t < "[Fov     ]: " < fov < '\n';
+		t < "[Near    ]: " < near < '\n';
+		t < "[Far     ]: " < far < '\n';
 		t < "[ViewPort]: " < viewport.str(", ", "\n");
 		return t;
 	};
-	friend std::ostream& operator<<(std::ostream& os, const XsCamera& v) {
-		auto _v = v;
-		std::cout << strinx(_v);
-		return os;
-	};
+	friend std::ostream& operator<<(std::ostream& os, const XsCamera& v) { return os << strinx(v); };
 };
 void XsDefaultCamera(XsCamera& cam) {
 	glScissor(0, 0, cam.viewport.x, cam.viewport.y);
