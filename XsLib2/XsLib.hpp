@@ -12,6 +12,7 @@
 #include <ImGui/imgui.h>
 #include <ImGui/imgui-SFML.h>
 #include <ImGui/imgui_stdlib.h>
+#include <ImGui/ImGuiFileDialog.h>
 #include <librarys/json.hpp>
 #include <librarys/magic_enum.hpp>
 #include <Strinx.hpp>
@@ -294,7 +295,6 @@ struct {
 			vex2f RotVel = 0.f;
 		} Cam;
 	} Editor;
-	void Save(const char* filename) { };
 } Xs;
 typedef decltype(decltype(Xs)::Enum)::Enum_t XsEnum;
 typedef decltype(decltype(Xs)::Key)::Key_t XsKey;
