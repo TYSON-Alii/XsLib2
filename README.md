@@ -1,5 +1,5 @@
 ## XsLib2
-![dsfsf](https://im7.ezgif.com/tmp/ezgif-7-075dbd4ba71a.gif)
+![dsfsf](https://cdn.discordapp.com/attachments/837068088473944104/910205688062554142/75dbd4ba71a.gif)
 ```cpp
 #include <iostream>
 #include <XsLib.hpp>
