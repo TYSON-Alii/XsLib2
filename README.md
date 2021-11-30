@@ -1,7 +1,5 @@
 ## XsLib2
 
-[sdsasda](https://cdn.discordapp.com/attachments/837068088473944104/909406031078117396/ezgif.com-gif-maker_1.gif)
-
 ```cpp
 #include <iostream>
 #include <XsLib.hpp>
