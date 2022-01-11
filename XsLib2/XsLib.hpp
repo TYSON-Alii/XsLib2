@@ -347,4 +347,4 @@ return false;																				\
 static bool __FxsIm = true;
 #define ImBlock(_Window) for([&](){ ImGui::SFML::Update(_Window, __IMCLOCK__.restart()); __FxsIm = true; }();__FxsIm;[&](){ _Window.pushGLStates(); ImGui::SFML::Render(_Window); _Window.popGLStates(); __FxsIm = false;}())
 
-#include <Engine/XsEngine>
+#include <Engine/XsEngine.hpp>
