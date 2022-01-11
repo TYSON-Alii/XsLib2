@@ -1,61 +1,58 @@
 ## XsLib2
 
 ```cpp
-#include <iostream>
 #include <XsLib.hpp>
 
-using namespace std;
-namespace im = ImGui;
-
-int main() {
-    sf::RenderWindow window;
-    vex3f speed = 0.f;
-    XsCamera kameram;
-    kameram.fov = 45.0f;
-    kameram.far = 1000.f;
-    kameram.near = 0.01f;
-    kameram.pos = vex3f(20.f, 20.f, 0.f);
-
-    XsTexture tex("data/mavi_32x32.png");
-    XsVerts magic;
-    magic = Xs.LoadOBJ("data/cube.obj", Xs.Enum.VertexAndTexture);
-
-    XsShape shape("sahpe.json");
-    shape.mode = Xs.Enum.VertexAndTexture;
-    shape.glmode = GL_QUADS;
-    shape.vert = &magic;
-    std::cout << shape;
-
-    XsVerts floor_vert;
-    floor_vert = Xs.LoadOBJ("data/plane.obj", Xs.Enum.VertexAndTexture);
-    XsShape floor;
-    floor.mode = Xs.Enum.VertexAndTexture;
-    floor.vert = &floor_vert;
-    floor.tex = &tex;
-
-    XsInfoList info_list("list");
-    info_list.Add("sdfdsf", tex);
-    info_list.Add("sahpe", shape);
-    info_list.Add("yre", floor);
-    
-    Xs.Editor.Cam.Speed_v = 0.03f;
-    XsStart(window, "HELLO WORLD !!") {
-        //if (Xs.KeyPressed(Xs.Key.Escape))
-        //    break;
-        Once(_change_them)
-            im::StyleXsDark();
-
-        kameram.viewport = { window.getSize().x, window.getSize().y };
-        XsEditorCamera(kameram);
-
-        floor.draw();
-        shape.draw();
-
-        ImBlock(window) {
-            info_list.Draw();
-            XsInfo(kameram, "kamerasd", true);
-        };
+class Kayadam : public XsShape {
+private:
+public:
+    vex3f vel = 0.f;
+    vex3f hitbox = 2.f;
+    void controller() {
+        if (Xs.KeyPressed(Xs.Key.Space))
+            vel.y += 0.005f;
     };
-    shape.save("sahpe.json");
+    void physics() {
+        vel.y -= 0.001f;
+        pos += vel;
+        const auto touch_axis = limit(pos, vex3f(-50, 0, -50) - hitbox / 2.f, vex3f(50, 50, 50) + hitbox / 2.f);
+        vel(touch_axis, 0.f);
+    };
+    void loop() {
+        controller();
+        physics();
+    };
+};
+#define win eng.Window
+#define var auto&
+auto main() -> int {
+    XsEngine eng;
+    var kameram = eng.Cam;
+    kameram.pos = vex3f(20.f, 20.f, 0.f);
+    var room = eng.New(new XsShape());
+    var kayadam = eng.New(new Kayadam());
+    var square_tex = eng.New(new XsTexture("data/mavi_32x32.png"));
+    var kayatex = eng.New(new XsTexture("data/kayadam.png"));
+    var cube = eng.New(new XsMesh());
+    var kayavert = eng.New(new XsMesh());
+    kayavert = Xs.LoadOBJ("data/kayadam.obj");
+    kayadam.mesh = &kayavert;
+    kayadam.tex = &kayatex;
+    cube = Xs.LoadOBJ("data/magic.obj");
+    room.pos.y = 25;
+    room.scale = vex3f(75, 75, 75);
+    room.mesh = &cube;
+    var anim = eng.New(new XsAnim());
+    anim.loadFromGIF("data/fizbuz.gif");
+    room.tex = &anim.Current();
+    Xs.Editor.Cam.Speed_v = 0.03f;
+    XsStart(eng, "HELLO WORLD !!") {
+        kameram.viewport << win.getSize();
+        XsEditorCamera(kameram);
+        eng();
+        ImBlock(eng.Window) {
+            XsInfo(room);
+        }
+    };
 };
 ```
