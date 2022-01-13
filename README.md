@@ -15,7 +15,7 @@ public:
     void physics() {
         vel.y -= 0.001f;
         pos += vel;
-        const auto touch_axis = limit(pos, vex3f(-50, 0, -50) - hitbox / 2.f, vex3f(50, 50, 50) + hitbox / 2.f);
+        const auto& touch_axis = limit(pos, vex3f(-50, 0, -50) - hitbox / 2.f, vex3f(50, 50, 50) + hitbox / 2.f);
         vel(touch_axis, 0.f);
     };
     void loop() {
