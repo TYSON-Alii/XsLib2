@@ -1,4 +1,13 @@
 ## XsLib2
+### Requirements
+[SFML - 2.5.1](https://github.com/SFML/SFML)
+[glm - latest](https://github.com/g-truc/glm)
+[glew - latest](https://github.com/nigels-com/glew)
+
+### Include Directorys
+\XsLib2
+\XsLib2\ImGui
+\XsLib2\librarys
 
 ```cpp
 #include <XsLib.hpp>
