@@ -2,6 +2,8 @@
 ### Requirements
 [SFML - 2.5.1](https://github.com/SFML/SFML)
 
+[Physx - 4.1](https://github.com/NVIDIAGameWorks/PhysX)
+
 [glm - latest](https://github.com/g-truc/glm)
 
 [glew - latest](https://github.com/nigels-com/glew)
