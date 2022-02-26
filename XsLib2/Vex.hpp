@@ -1,5 +1,7 @@
+#ifndef _XS_VEX2_
 #define _XS_VEX2_
 #include <vector>
+#include <iostream>
 #include <string>
 #include <sstream>
 template <typename T> struct vex2;
@@ -17,10 +19,10 @@ struct vex2 {
     inline operator strinx() const { return strinx(x) + ' ' + strinx(y); };
 #endif
 #ifdef __VEX2GLM_FUNCS__ // in GLM-Vex.hpp
-    __VEX2GLM_FUNCS__
+    __VEX2GLM_FUNCS__;
 #endif
 #ifdef __VEX2IM_FUNCS__ // in ImGui-Vex.hpp
-        __VEX2IM_FUNCS__
+    __VEX2IM_FUNCS__;
 #endif
     inline T* data() { return &x; };
     inline T* data() const { return &x; };
@@ -40,9 +42,9 @@ struct vex2 {
     template <typename _T> inline vex2<T>& operator=(_T* v) { x = T(v[0]); y = T(v[1]); return *this; };
     template <typename _T> inline vex2<T>& operator=(vex2<_T> v) { x = T(v.x); y = T(v.y); return *this; };
 
-    template <> vex2(std::string v);
-    template <> vex2(std::string v1, std::string v2);
-    template <> vex2<T>& operator=(std::string v);
+    vex2(std::string v);
+    vex2(std::string v1, std::string v2);
+    vex2<T>& operator=(std::string v);
 
     inline bool isEmpty() const { return !(x && y); };
     inline operator bool() const { return (x && y); };
@@ -230,10 +232,10 @@ struct vex3 {
     inline operator strinx() const { return strinx(x) + ' ' + strinx(y) + ' ' + strinx(z); };
 #endif
 #ifdef __VEX3GLM_FUNCS__
-    __VEX3GLM_FUNCS__
+    __VEX3GLM_FUNCS__;
 #endif
 #ifdef __VEX3IM_FUNCS__
-        __VEX3IM_FUNCS__
+    __VEX3IM_FUNCS__;
 #endif
     inline T* data() { return &x; };
     inline T* data() const { return &x; };
@@ -257,10 +259,10 @@ struct vex3 {
     template <typename _T> inline vex3<T>& operator=(_T* v) { x = T(v[0]); y = T(v[1]); z = T(v[2]); return *this; };
     template <typename _T> inline vex3<T>& operator=(vex3<_T> v) { x = T(v.x); y = T(v.y); z = T(v.z); return *this; };
 
-    template <> vex3(std::string v);
-    template <> vex3(std::string v1, std::string v2);
-    template <> vex3(std::string v1, std::string v2, std::string v3);
-    template <> vex3<T>& operator=(std::string v);
+    vex3(std::string v);
+    vex3(std::string v1, std::string v2);
+    vex3(std::string v1, std::string v2, std::string v3);
+    vex3<T>& operator=(std::string v);
 
     inline bool isEmpty()  const { return !(x && y && z); };
     inline operator bool() const { return (x && y && z); };
@@ -459,15 +461,15 @@ struct vex4 {
     inline operator T* () { return arr(); };
     inline operator T* () const { return arr(); };
     inline operator std::string() const { return (std::to_string(x) + ' ' + std::to_string(y) + ' ' + std::to_string(z) + ' ' + std::to_string(w)); };
-    inline operator char* () const { return _strdup((std::to_string(x) + ' ' + std::to_string(y) + ' ' + std::to_string(z) + ' ' + std::to_string(w)).c_str()); };
+    inline operator const char* () const { return _strdup((std::to_string(x) + ' ' + std::to_string(y) + ' ' + std::to_string(z) + ' ' + std::to_string(w)).c_str()); };
 #ifdef _XS_STRINX_
     inline operator strinx() const { return strinx(x) + ' ' + strinx(y) + ' ' + strinx(z) + ' ' + strinx(w); };
 #endif
 #ifdef __VEX4GLM_FUNCS__
-    __VEX4GLM_FUNCS__
+    __VEX4GLM_FUNCS__;
 #endif
 #ifdef __VEX4IM_FUNCS__
-        __VEX4IM_FUNCS__
+    __VEX4IM_FUNCS__;
 #endif
     inline T* data() { return &x; };
     inline T* data() const { return &x; };
@@ -499,11 +501,11 @@ struct vex4 {
     template <typename _T> inline vex4<T>& operator=(_T* v) { x = T(v[0]); y = T(v[1]); z = T(v[2]); w = T(v[3]); return *this; };
     template <typename _T> inline vex4<T>& operator=(vex4<_T> v) { x = T(v.x); y = T(v.y); z = T(v.z); w = T(v.w); return *this; };
 
-    template <> vex4(std::string v);
-    template <> vex4(std::string v1, std::string v2);
-    template <> vex4(std::string v1, std::string v2, std::string v3);
-    template <> vex4(std::string v1, std::string v2, std::string v3, std::string v4);
-    template <> vex4<T>& operator=(std::string v);
+    vex4(std::string v);
+    vex4(std::string v1, std::string v2);
+    vex4(std::string v1, std::string v2, std::string v3);
+    vex4(std::string v1, std::string v2, std::string v3, std::string v4);
+    vex4<T>& operator=(std::string v);
 
     inline bool isEmpty() const { return !(x && y && z && w); };
     inline operator bool() const { return (x && y && z && w); };
@@ -742,6 +744,18 @@ typedef vex4<long int>      vex4li;
 typedef vex4<long long int> vex4lli;
 typedef vex4<std::string>   vex4s;
 
+#ifndef XS_UTILITY
+template <typename T> T sto(const std::string&);
+template <> inline int sto<int>(const std::string& _str) { return std::stoi(_str); };
+template <> inline float sto<float>(const std::string& _str) { return std::stof(_str); };
+template <> inline double sto<double>(const std::string& _str) { return std::stod(_str); };
+template <> inline long double sto<long double>(const std::string& _str) { return std::stold(_str); };
+template <> inline size_t sto<size_t>(const std::string& _str) { return (size_t)std::stoi(_str); };
+template <> inline long sto<long>(const std::string& _str) { return std::stol(_str); };
+template <> inline long long sto<long long>(const std::string& _str) { return std::stoll(_str); };
+//template <> inline unsigned long long sto<unsigned long long>(const std::string& _str) { return std::stoull(_str); };
+#endif
+
 #define DelForIntVexs(_type) \
 template<> vex2<_type>& vex2<_type>::normalize() = delete;      \
 template<> vex2<_type> vex2<_type>::normalize() const = delete; \
@@ -859,102 +873,18 @@ template<> vex4<strinx> vex4<strinx>::percent(strinx v1, strinx v2, strinx v3, s
 typedef vex4<strinx> vex4x;
 #endif
 
-template<> template<> vex2<float>::vex2(std::string v) { x = y = std::stof(v.c_str()); };
-template<> template<> vex2<int>::vex2(std::string v) { x = y = std::stoi(v.c_str()); };
-template<> template<> vex2<size_t>::vex2(std::string v) { x = y = std::stoi(v.c_str()); };
-template<> template<> vex2<long int>::vex2(std::string v) { x = y = std::stoi(v.c_str()); };
-template<> template<> vex2<long long int>::vex2(std::string v) { x = y = std::stoi(v.c_str()); };
-template<> template<> vex2<double>::vex2(std::string v) { x = y = std::stof(v.c_str()); };
-template<> template<> vex2<long double>::vex2(std::string v) { x = y = std::stof(v.c_str()); };
-
-template<> template<> vex2<float>::vex2(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-template<> template<> vex2<int>::vex2(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex2<size_t>::vex2(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex2<long int>::vex2(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex2<long long int>::vex2(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex2<double>::vex2(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-template<> template<> vex2<long double>::vex2(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-
-template<> template<> vex2<float>& vex2<float>::operator=(std::string v) { x = y = std::stof(v.c_str()); return *this; };
-template<> template<> vex2<int>& vex2<int>::operator=(std::string v) { x = y = std::stoi(v.c_str()); return *this; };
-template<> template<> vex2<size_t>& vex2<size_t>::operator=(std::string v) { x = y = std::stoi(v.c_str()); return *this; };
-template<> template<> vex2<long int>& vex2<long int>::operator=(std::string v) { x = y = std::stoi(v.c_str()); return *this; };
-template<> template<> vex2<long long int>& vex2<long long int>::operator=(std::string v) { x = y = std::stoi(v.c_str()); return *this; };
-template<> template<> vex2<double>& vex2<double>::operator=(std::string v) { x = y = std::stof(v.c_str()); return *this; };
-template<> template<> vex2<long double>& vex2<long double>::operator=(std::string v) { x = y = std::stof(v.c_str()); return *this; };
-
-
-template<> template<> vex3<float>::vex3(std::string v) { x = y = z = std::stof(v); };
-template<> template<> vex3<int>::vex3(std::string v) { x = y = z = std::stoi(v); };
-template<> template<> vex3<size_t>::vex3(std::string v) { x = y = z = std::stoi(v); };
-template<> template<> vex3<long int>::vex3(std::string v) { x = y = z = std::stoi(v); };
-template<> template<> vex3<long long int>::vex3(std::string v) { x = y = z = std::stoi(v); };
-template<> template<> vex3<double>::vex3(std::string v) { x = y = z = std::stof(v); };
-template<> template<> vex3<long double>::vex3(std::string v) { x = y = z = std::stof(v); };
-
-template<> template<> vex3<float>::vex3(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-template<> template<> vex3<int>::vex3(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex3<size_t>::vex3(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex3<long int>::vex3(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex3<long long int>::vex3(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex3<double>::vex3(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-template<> template<> vex3<long double>::vex3(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-
-template<> template<> vex3<float>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); };
-template<> template<> vex3<int>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex3<size_t>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex3<long int>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex3<long long int>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex3<double>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); };
-template<> template<> vex3<long double>::vex3(std::string v1, std::string v2, std::string v3) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); };
-
-template<> template<> vex3<float>& vex3<float>::operator=(std::string v) { x = y = z = std::stof(v.c_str()); return *this; };
-template<> template<> vex3<int>& vex3<int>::operator=(std::string v) { x = y = z = std::stoi(v.c_str()); return *this; };
-template<> template<> vex3<size_t>& vex3<size_t>::operator=(std::string v) { x = y = z = std::stoi(v.c_str()); return *this; };
-template<> template<> vex3<long int>& vex3<long int>::operator=(std::string v) { x = y = z = std::stoi(v.c_str()); return *this; };
-template<> template<> vex3<long long int>& vex3<long long int>::operator=(std::string v) { x = y = z = std::stoi(v.c_str()); return *this; };
-template<> template<> vex3<double>& vex3<double>::operator=(std::string v) { x = y = z = std::stof(v.c_str()); return *this; };
-template<> template<> vex3<long double>& vex3<long double>::operator=(std::string v) { x = y = z = std::stof(v.c_str()); return *this; };
-
-
-template<> template<> vex4<float>::vex4(std::string v) { x = y = z = w = std::stof(v.c_str()); };
-template<> template<> vex4<int>::vex4(std::string v) { x = y = z = w = std::stoi(v.c_str()); };
-template<> template<> vex4<size_t>::vex4(std::string v) { x = y = z = w = std::stoi(v.c_str()); };
-template<> template<> vex4<long int>::vex4(std::string v) { x = y = z = w = std::stoi(v.c_str()); };
-template<> template<> vex4<long long int>::vex4(std::string v) { x = y = z = w = std::stoi(v.c_str()); };
-template<> template<> vex4<double>::vex4(std::string v) { x = y = z = w = std::stof(v.c_str()); };
-template<> template<> vex4<long double>::vex4(std::string v) { x = y = z = w = std::stof(v.c_str()); };
-
-template<> template<> vex4<float>::vex4(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-template<> template<> vex4<int>::vex4(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex4<size_t>::vex4(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex4<long int>::vex4(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex4<long long int>::vex4(std::string v1, std::string v2) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); };
-template<> template<> vex4<double>::vex4(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-template<> template<> vex4<long double>::vex4(std::string v1, std::string v2) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); };
-
-template<> template<> vex4<float>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); };
-template<> template<> vex4<int>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex4<size_t>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex4<long int>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex4<long long int>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); };
-template<> template<> vex4<double>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); };
-template<> template<> vex4<long double>::vex4(std::string v1, std::string v2, std::string v3) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); };
-
-template<> template<> vex4<float>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); w = std::stof(v4.c_str()); };
-template<> template<> vex4<int>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); w = std::stoi(v4.c_str()); };
-template<> template<> vex4<size_t>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); w = std::stoi(v4.c_str()); };
-template<> template<> vex4<long int>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); w = std::stoi(v4.c_str()); };
-template<> template<> vex4<long long int>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stoi(v1.c_str()); y = std::stoi(v2.c_str()); z = std::stoi(v3.c_str()); w = std::stoi(v4.c_str()); };
-template<> template<> vex4<double>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); w = std::stof(v4.c_str()); };
-template<> template<> vex4<long double>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = std::stof(v1.c_str()); y = std::stof(v2.c_str()); z = std::stof(v3.c_str()); w = std::stof(v4.c_str()); };
-
-template<> template<> vex4<float>& vex4<float>::operator=(std::string v) { x = y = z = w = std::stof(v.c_str()); return *this; };
-template<> template<> vex4<int>& vex4<int>::operator=(std::string v) { x = y = z = w = std::stoi(v.c_str()); return *this; };
-template<> template<> vex4<size_t>& vex4<size_t>::operator=(std::string v) { x = y = z = w = std::stoi(v.c_str()); return *this; };
-template<> template<> vex4<long int>& vex4<long int>::operator=(std::string v) { x = y = z = w = std::stoi(v.c_str()); return *this; };
-template<> template<> vex4<long long int>& vex4<long long int>::operator=(std::string v) { x = y = z = w = std::stoi(v.c_str()); return *this; };
-template<> template<> vex4<long double>& vex4<long double>::operator=(std::string v) { x = y = z = w = std::stof(v.c_str()); return *this; };
+template<typename T> vex2<T>::vex2(std::string v) { x = y = sto<T>(v); };
+template<typename T> vex2<T>::vex2(std::string v1, std::string v2) { x = sto<T>(v1); y = sto<T>(v2); };
+template<typename T> vex2<T>& vex2<T>::operator=(std::string v) { x = y = sto<T>(v); return *this; };
+template<typename T> vex3<T>::vex3(std::string v) { x = y = z = sto<T>(v); };
+template<typename T> vex3<T>::vex3(std::string v1, std::string v2) { x = sto<T>(v1); y = sto<T>(v2); };
+template<typename T> vex3<T>::vex3(std::string v1, std::string v2, std::string v3) { x = sto<T>(v1); y = sto<T>(v2); z = sto<T>(v3); };
+template<typename T> vex3<T>& vex3<T>::operator=(std::string v) { x = y = z = sto<T>(v); return *this; };
+template<typename T> vex4<T>::vex4(std::string v) { x = y = z = w = sto<T>(v); };
+template<typename T> vex4<T>::vex4(std::string v1, std::string v2) { x = sto<T>(v1); y = sto<T>(v2); };
+template<typename T> vex4<T>::vex4(std::string v1, std::string v2, std::string v3) { x = sto<T>(v1); y = sto<T>(v2); z = sto<T>(v3); };
+template<typename T> vex4<T>::vex4(std::string v1, std::string v2, std::string v3, std::string v4) { x = sto<T>(v1); y = sto<T>(v2); z = sto<T>(v3); w = sto<T>(v4); };
+template<typename T> vex4<T>& vex4<T>::operator=(std::string v) { x = y = z = w = sto<T>(v); return *this; };
 
 inline vex2f operator""_vex2f(unsigned long long v) { return vex2f(v); };
 inline vex2i operator""_vex2i(unsigned long long v) { return vex2i(v); };
@@ -1044,201 +974,81 @@ _VexTypedefs_
 #endif
 
 namespace std {
-    inline vex2f    ceil(vex2f v) { return vex2f(std::ceil(v.x), std::ceil(v.y)); };
-    inline vex2d    ceil(vex2d v) { return vex2d(std::ceil(v.x), std::ceil(v.y)); };
-    inline vex2f    floor(vex2f v) { return vex2f(std::floor(v.x), std::floor(v.y)); };
-    inline vex2d    floor(vex2d v) { return vex2d(std::floor(v.x), std::floor(v.y)); };
-    inline vex2f    abs(vex2f v) { return vex2f(std::abs(v.x), std::abs(v.y)); };
-    inline vex2d    abs(vex2d v) { return vex2d(std::abs(v.x), std::abs(v.y)); };
-    inline vex2i    abs(vex2i v) { return vex2i(std::abs(v.x), std::abs(v.y)); };
-    inline vex2li   abs(vex2li v) { return vex2li(std::abs(v.x), std::abs(v.y)); };
-    inline vex2lli  abs(vex2lli v) { return vex2lli(std::abs(v.x), std::abs(v.y)); };
-    inline vex2f    round(vex2f v) { return vex2f(std::round(v.x), std::round(v.y)); };
-    inline vex2d    round(vex2d v) { return vex2d(std::round(v.x), std::round(v.y)); };
-    inline vex2f    trunc(vex2f v) { return vex2f(std::trunc(v.x), std::trunc(v.y)); };
-    inline vex2d    trunc(vex2d v) { return vex2d(std::trunc(v.x), std::trunc(v.y)); };
-    inline vex2f    exp(vex2f v) { return vex2f(std::exp(v.x), std::exp(v.y)); };
-    inline vex2d    exp(vex2d v) { return vex2d(std::exp(v.x), std::exp(v.y)); };
-    inline vex2f    sqrt(vex2f v) { return vex2f(std::sqrt(v.x), std::sqrt(v.y)); };
-    inline vex2d    sqrt(vex2d v) { return vex2d(std::sqrt(v.x), std::sqrt(v.y)); };
-    inline vex2i    sqrt(vex2i v) { return vex2i(std::sqrt(v.x), std::sqrt(v.y)); };
-    inline vex2li   sqrt(vex2li v) { return vex2li(std::sqrt(v.x), std::sqrt(v.y)); };
-    inline vex2lli  sqrt(vex2lli v) { return vex2lli(std::sqrt(v.x), std::sqrt(v.y)); };
-    inline vex2f    cbrt(vex2f v) { return vex2f(std::cbrt(v.x), std::cbrt(v.y)); };
-    inline vex2d    cbrt(vex2d v) { return vex2d(std::cbrt(v.x), std::cbrt(v.y)); };
-    inline vex2i    cbrt(vex2i v) { return vex2i(std::cbrt(v.x), std::cbrt(v.y)); };
-    inline vex2li   cbrt(vex2li v) { return vex2li(std::cbrt(v.x), std::cbrt(v.y)); };
-    inline vex2lli  cbrt(vex2lli v) { return vex2lli(std::cbrt(v.x), std::cbrt(v.y)); };
-    inline vex2f    pow(vex2f v, int p) { return vex2f(std::pow(v.x, p), std::pow(v.y, p)); };
-    inline vex2d    pow(vex2d v, int p) { return vex2d(std::pow(v.x, p), std::pow(v.y, p)); };
-    inline vex2i    pow(vex2i v, int p) { return vex2i(std::pow(v.x, p), std::pow(v.y, p)); };
-    inline vex2li   pow(vex2li v, int p) { return vex2li(std::pow(v.x, p), std::pow(v.y, p)); };
-    inline vex2lli  pow(vex2lli v, int p) { return vex2lli(std::pow(v.x, p), std::pow(v.y, p)); };
-    inline vex2f&   max(vex2f& v1, vex2f& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex2d&   max(vex2d& v1, vex2d& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex2i&   max(vex2i& v1, vex2i& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex2li&  max(vex2li& v1, vex2li& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex2lli& max(vex2lli& v1, vex2lli& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex2f&   min(vex2f& v1, vex2f& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex2d&   min(vex2d& v1, vex2d& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex2i&   min(vex2i& v1, vex2i& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex2li&  min(vex2li& v1, vex2li& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex2lli& min(vex2lli& v1, vex2lli& v2) { return (v1 < v2) ? v1 : v2; };
+    inline vex2f ceil(vex2f v) { return vex2f(std::ceil(v.x), std::ceil(v.y)); };
+    inline vex2d ceil(vex2d v) { return vex2d(std::ceil(v.x), std::ceil(v.y)); };
+    inline vex2f floor(vex2f v) { return vex2f(std::floor(v.x), std::floor(v.y)); };
+    inline vex2d floor(vex2d v) { return vex2d(std::floor(v.x), std::floor(v.y)); };
+    inline vex2f round(vex2f v) { return vex2f(std::round(v.x), std::round(v.y)); };
+    inline vex2d round(vex2d v) { return vex2d(std::round(v.x), std::round(v.y)); };
+    inline vex2f trunc(vex2f v) { return vex2f(std::trunc(v.x), std::trunc(v.y)); };
+    inline vex2d trunc(vex2d v) { return vex2d(std::trunc(v.x), std::trunc(v.y)); };
+    inline vex2f exp(vex2f v) { return vex2f(std::exp(v.x), std::exp(v.y)); };
+    inline vex2d exp(vex2d v) { return vex2d(std::exp(v.x), std::exp(v.y)); };
+    template <typename T> inline vex2<T> abs(vex2<T> v) { return vex2<T>(std::abs(v.x), std::abs(v.y)); };
+    template <typename T> inline vex2<T> sqrt(vex2<T> v) { return vex2<T>(std::sqrt(v.x), std::sqrt(v.y)); };
+    template <typename T> inline vex2<T> cbrt(vex2<T> v) { return vex2<T>(std::cbrt(v.x), std::cbrt(v.y)); };
+    template <typename T> inline vex2<T> pow(vex2<T> v, int p) { return vex2<T>(std::pow(v.x, p), std::pow(v.y, p)); };
+    template <typename T> inline vex2<T>& max(vex2<T>& v1, vex2<T>& v2) { return (v1 > v2) ? v1 : v2; };
+    template <typename T> inline vex2<T>& min(vex2<T>& v1, vex2<T>& v2) { return (v1 < v2) ? v1 : v2; };
 
-    inline vex3f   ceil(vex3f v) { return vex3f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z)); };
-    inline vex3d   ceil(vex3d v) { return vex3f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z)); };
-    inline vex3f   floor(vex3f v) { return vex3f(std::floor(v.x), std::floor(v.y), std::floor(v.z)); };
-    inline vex3d   floor(vex3d v) { return vex3d(std::floor(v.x), std::floor(v.y), std::floor(v.z)); };
-    inline vex3f   abs(vex3f v) { return vex3f(std::abs(v.x), std::abs(v.y), std::abs(v.z)); };
-    inline vex3d   abs(vex3d v) { return vex3d(std::abs(v.x), std::abs(v.y), std::abs(v.z)); };
-    inline vex3f   round(vex3f v) { return vex3f(std::round(v.x), std::round(v.y), std::round(v.z)); };
-    inline vex3d   round(vex3d v) { return vex3d(std::round(v.x), std::round(v.y), std::round(v.z)); };
-    inline vex3f   trunc(vex3f v) { return vex3f(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z)); };
-    inline vex3d   trunc(vex3d v) { return vex3d(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z)); };
-    inline vex3f   exp(vex3f v) { return vex3f(std::exp(v.x), std::exp(v.y), std::exp(v.z)); };
-    inline vex3d   exp(vex3d v) { return vex3d(std::exp(v.x), std::exp(v.y), std::exp(v.z)); };
-    inline vex3f   sqrt(vex3f v) { return vex3f(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z)); };
-    inline vex3d   sqrt(vex3d v) { return vex3d(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z)); };
-    inline vex3i   sqrt(vex3i v) { return vex3i(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z)); };
-    inline vex3li  sqrt(vex3li v) { return vex3li(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z)); };
-    inline vex3lli sqrt(vex3lli v) { return vex3lli(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z)); };
-    inline vex3f   cbrt(vex3f v) { return vex3f(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z)); };
-    inline vex3d   cbrt(vex3d v) { return vex3d(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z)); };
-    inline vex3i   cbrt(vex3i v) { return vex3i(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z)); };
-    inline vex3li  cbrt(vex3li v) { return vex3li(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z)); };
-    inline vex3lli cbrt(vex3lli v) { return vex3lli(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z)); };
-    inline vex3f   pow(vex3f v, int p) { return vex3f(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p)); };
-    inline vex3d   pow(vex3d v, int p) { return vex3d(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p)); };
-    inline vex3i   pow(vex3i v, int p) { return vex3i(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p)); };
-    inline vex3li  pow(vex3li v, int p) { return vex3li(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p)); };
-    inline vex3lli pow(vex3lli v, int p) { return vex3lli(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p)); };
-    inline vex3f&  max(vex3f& v1, vex3f& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex3d&  max(vex3d& v1, vex3d& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex3i&  max(vex3i& v1, vex3i& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex3li& max(vex3li& v1, vex3li& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex3lli& max(vex3lli& v1, vex3lli& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex3f&  min(vex3f& v1, vex3f& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex3d&  min(vex3d& v1, vex3d& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex3i&  min(vex3i& v1, vex3i& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex3li& min(vex3li& v1, vex3li& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex3lli& min(vex3lli& v1, vex3lli& v2) { return (v1 < v2) ? v1 : v2; };
+    inline vex3f ceil(vex3f v) { return vex3f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z)); };
+    inline vex3d ceil(vex3d v) { return vex3f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z)); };
+    inline vex3f floor(vex3f v) { return vex3f(std::floor(v.x), std::floor(v.y), std::floor(v.z)); };
+    inline vex3d floor(vex3d v) { return vex3d(std::floor(v.x), std::floor(v.y), std::floor(v.z)); };
+    inline vex3f round(vex3f v) { return vex3f(std::round(v.x), std::round(v.y), std::round(v.z)); };
+    inline vex3d round(vex3d v) { return vex3d(std::round(v.x), std::round(v.y), std::round(v.z)); };
+    inline vex3f trunc(vex3f v) { return vex3f(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z)); };
+    inline vex3d trunc(vex3d v) { return vex3d(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z)); };
+    inline vex3f exp(vex3f v) { return vex3f(std::exp(v.x), std::exp(v.y), std::exp(v.z)); };
+    inline vex3d exp(vex3d v) { return vex3d(std::exp(v.x), std::exp(v.y), std::exp(v.z)); };
+    template <typename T> inline vex3<T> abs(vex3<T> v) { return vex3<T>(std::abs(v.x), std::abs(v.y), std::abs(v.z)); };
+    template <typename T> inline vex3<T> sqrt(vex3<T> v) { return vex3<T>(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z)); };
+    template <typename T> inline vex3<T> cbrt(vex3<T> v) { return vex3<T>(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z)); };
+    template <typename T> inline vex3<T> pow(vex3<T> v, int p) { return vex3<T>(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p)); };
+    template <typename T> inline vex3<T>& max(vex3<T>& v1, vex3<T>& v2) { return (v1 > v2) ? v1 : v2; };
+    template <typename T> inline vex3<T>& min(vex3<T>& v1, vex3<T>& v2) { return (v1 < v2) ? v1 : v2; };
 
-    inline vex4f   ceil(vex4f v) { return vex4f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z), std::ceil(v.w)); };
-    inline vex4d   ceil(vex4d v) { return vex4f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z), std::ceil(v.w)); };
-    inline vex4f   floor(vex4f v) { return vex4f(std::floor(v.x), std::floor(v.y), std::floor(v.z), std::floor(v.w)); };
-    inline vex4d   floor(vex4d v) { return vex4d(std::floor(v.x), std::floor(v.y), std::floor(v.z), std::floor(v.w)); };
-    inline vex4f   abs(vex4f v) { return vex4f(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w)); };
-    inline vex4d   abs(vex4d v) { return vex4d(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w)); };
-    inline vex4f   round(vex4f v) { return vex4f(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w)); };
-    inline vex4d   round(vex4d v) { return vex4d(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w)); };
-    inline vex4f   trunc(vex4f v) { return vex4f(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z), std::trunc(v.w)); };
-    inline vex4d   trunc(vex4d v) { return vex4d(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z), std::trunc(v.w)); };
-    inline vex4d   exp(vex4d v) { return vex4f(std::exp(v.x), std::exp(v.y), std::exp(v.z), std::exp(v.w)); };
-    inline vex4f   exp(vex4f v) { return vex4d(std::exp(v.x), std::exp(v.y), std::exp(v.z), std::exp(v.w)); };
-    inline vex4f   sqrt(vex4f v) { return vex4f(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z), std::sqrt(v.w)); };
-    inline vex4d   sqrt(vex4d v) { return vex4d(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z), std::sqrt(v.w)); };
-    inline vex4i   sqrt(vex4i v) { return vex4i(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z), std::sqrt(v.w)); };
-    inline vex4li  sqrt(vex4li v) { return vex4li(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z), std::sqrt(v.w)); };
-    inline vex4lli sqrt(vex4lli v) { return vex4lli(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z), std::sqrt(v.w)); };
-    inline vex4f   cbrt(vex4f v) { return vex4f(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z), std::cbrt(v.w)); };
-    inline vex4d   cbrt(vex4d v) { return vex4d(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z), std::cbrt(v.w)); };
-    inline vex4i   cbrt(vex4i v) { return vex4i(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z), std::cbrt(v.w)); };
-    inline vex4li  cbrt(vex4li v) { return vex4li(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z), std::cbrt(v.w)); };
-    inline vex4lli cbrt(vex4lli v) { return vex4lli(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z), std::cbrt(v.w)); };
-    inline vex4f   pow(vex4f v, int p) { return vex4f(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p), std::pow(v.w, p)); };
-    inline vex4d   pow(vex4d v, int p) { return vex4d(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p), std::pow(v.w, p)); };
-    inline vex4i   pow(vex4i v, int p) { return vex4i(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p), std::pow(v.w, p)); };
-    inline vex4li  pow(vex4li v, int p) { return vex4li(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p), std::pow(v.w, p)); };
-    inline vex4lli pow(vex4lli v, int p) { return vex4lli(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p), std::pow(v.w, p)); };
-    inline vex4f&  max(vex4f& v1, vex4f& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex4d&  max(vex4d& v1, vex4d& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex4i&  max(vex4i& v1, vex4i& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex4li& max(vex4li& v1, vex4li& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex4lli& max(vex4lli& v1, vex4lli& v2) { return (v1 > v2) ? v1 : v2; };
-    inline vex4f&  min(vex4f& v1, vex4f& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex4d&  min(vex4d& v1, vex4d& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex4i&  min(vex4i& v1, vex4i& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex4li& min(vex4li& v1, vex4li& v2) { return (v1 < v2) ? v1 : v2; };
-    inline vex4lli& min(vex4lli& v1, vex4lli& v2) { return (v1 < v2) ? v1 : v2; };
-    vex2f strtov2f(const std::string& _s) {
+    inline vex4f ceil(vex4f v) { return vex4f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z), std::ceil(v.w)); };
+    inline vex4d ceil(vex4d v) { return vex4f(std::ceil(v.x), std::ceil(v.y), std::ceil(v.z), std::ceil(v.w)); };
+    inline vex4f floor(vex4f v) { return vex4f(std::floor(v.x), std::floor(v.y), std::floor(v.z), std::floor(v.w)); };
+    inline vex4d floor(vex4d v) { return vex4d(std::floor(v.x), std::floor(v.y), std::floor(v.z), std::floor(v.w)); };
+    inline vex4f round(vex4f v) { return vex4f(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w)); };
+    inline vex4d round(vex4d v) { return vex4d(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w)); };
+    inline vex4f trunc(vex4f v) { return vex4f(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z), std::trunc(v.w)); };
+    inline vex4d trunc(vex4d v) { return vex4d(std::trunc(v.x), std::trunc(v.y), std::trunc(v.z), std::trunc(v.w)); };
+    inline vex4d exp(vex4d v) { return vex4f(std::exp(v.x), std::exp(v.y), std::exp(v.z), std::exp(v.w)); };
+    inline vex4f exp(vex4f v) { return vex4d(std::exp(v.x), std::exp(v.y), std::exp(v.z), std::exp(v.w)); };
+    template <typename T> inline vex4<T> abs(vex4<T> v) { return vex4<T>(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w)); };
+    template <typename T> inline vex4<T> sqrt(vex4<T> v) { return vex4<T>(std::sqrt(v.x), std::sqrt(v.y), std::sqrt(v.z), std::sqrt(v.w)); };
+    template <typename T> inline vex4<T> cbrt(vex4<T> v) { return vex4<T>(std::cbrt(v.x), std::cbrt(v.y), std::cbrt(v.z), std::cbrt(v.w)); };
+    template <typename T> inline vex4<T> pow(vex4<T> v, int p) { return vex4<T>(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p), std::pow(v.w, p)); };
+    template <typename T> inline vex4<T>& max(vex4<T>& v1, vex4<T>& v2) { return (v1 > v2) ? v1 : v2; };
+    template <typename T> inline vex4<T>& min(vex4<T>& v1, vex4<T>& v2) { return (v1 < v2) ? v1 : v2; };
+    template <typename T> vex2<T> stov2(const std::string& _s) {
         stringstream ss;
         string s;
-        vex2f t;
+        vex2<T> t;
         ss << _s;
         for (size_t i = 0u; i < 2u and ss >> s; i++)
-            t[i] = stof(s);
+            t[i] = sto<T>(s);
         return t;
     };
-    vex2d strtov2d(const std::string& _s) {
+    template <typename T> vex3<T> stov3(const std::string& _s) {
         stringstream ss;
         string s;
-        vex2d t;
-        ss << _s;
-        for (size_t i = 0u; i < 2u and ss >> s; i++)
-            t[i] = stod(s);
-        return t;
-    };
-    vex2i strtov2i(const std::string& _s) {
-        stringstream ss;
-        string s;
-        vex2i t;
-        ss << _s;
-        for (size_t i = 0u; i < 2u and ss >> s; i++)
-            t[i] = stoi(s);
-        return t;
-    };
-    vex3f strtov3f(const std::string& _s) {
-        stringstream ss;
-        string s;
-        vex3f t;
+        vex3<T> t;
         ss << _s;
         for (size_t i = 0u; i < 3u and ss >> s; i++)
-            t[i] = stof(s);
+            t[i] = sto<T>(s);
         return t;
     };
-    vex3d strtov3d(const std::string& _s) {
+    template <typename T> vex4<T> stov4(const std::string& _s) {
         stringstream ss;
         string s;
-        vex3d t;
-        ss << _s;
-        for (size_t i = 0u; i < 3u and ss >> s; i++)
-            t[i] = stod(s);
-        return t;
-    };
-    vex3i strtov3i(const std::string& _s) {
-        stringstream ss;
-        string s;
-        vex3i t;
-        ss << _s;
-        for (size_t i = 0u; i < 3u and ss >> s; i++)
-            t[i] = stoi(s);
-        return t;
-    };
-    vex4f strtov4f(const std::string& _s) {
-        stringstream ss;
-        string s;
-        vex4f t;
+        vex4<T> t;
         ss << _s;
         for (size_t i = 0u; i < 4u and ss >> s; i++)
-            t[i] = stof(s);
-        return t;
-    };
-    vex4d strtov4d(const std::string& _s) {
-        stringstream ss;
-        string s;
-        vex4d t;
-        ss << _s;
-        for (size_t i = 0u; i < 4u and ss >> s; i++)
-            t[i] = stod(s);
-        return t;
-    };
-    vex4i strtov4i(const std::string& _s) {
-        stringstream ss;
-        string s;
-        vex4i t;
-        ss << _s;
-        for (size_t i = 0u; i < 4u and ss >> s; i++)
-            t[i] = stoi(s);
+            t[i] = sto<T>(s);
         return t;
     };
     template <typename T> std::string to_string(vex2<T> v, const std::string& sep = " ", const std::string& end = "") { return v.str(sep, end); };
@@ -1256,44 +1066,20 @@ template <typename T> std::vector<T>& operator+=(std::vector<T>& v, const vex4<T
 template <typename T> std::vector<T>& operator<<(std::vector<T>& v, const vex4<T>& i) { v.emplace_back({ i.x, i.y, i.z, i.w }); return v; };
 template <typename T> std::vector<T> operator+(std::vector<T> v, const vex4<T>& i) { std::vector<T> t = v; t.emplace_back({ i.x, i.y, i.z, i.w }); return t; };
 
-inline vex2f operator+(const char* l, const vex2f& r) { return std::strtov2f(l) + r; };
-inline vex2f operator-(const char* l, const vex2f& r) { return std::strtov2f(l) - r; };
-inline vex2f operator/(const char* l, const vex2f& r) { return std::strtov2f(l) / r; };
-inline vex2f operator*(const char* l, const vex2f& r) { return std::strtov2f(l) * r; };
-inline vex2d operator+(const char* l, const vex2d& r) { return std::strtov2d(l) + r; };
-inline vex2d operator-(const char* l, const vex2d& r) { return std::strtov2d(l) - r; };
-inline vex2d operator/(const char* l, const vex2d& r) { return std::strtov2d(l) / r; };
-inline vex2d operator*(const char* l, const vex2d& r) { return std::strtov2d(l) * r; };
-inline vex2i operator+(const char* l, const vex2i& r) { return std::strtov2i(l) + r; };
-inline vex2i operator-(const char* l, const vex2i& r) { return std::strtov2i(l) - r; };
-inline vex2i operator/(const char* l, const vex2i& r) { return std::strtov2i(l) / r; };
-inline vex2i operator*(const char* l, const vex2i& r) { return std::strtov2i(l) * r; };
+template <typename T> inline vex2<T> operator+(const char* l, const vex2<T>& r) { return std::stov2<T>(l) + r; };
+template <typename T> inline vex2<T> operator-(const char* l, const vex2<T>& r) { return std::stov2<T>(l) - r; };
+template <typename T> inline vex2<T> operator/(const char* l, const vex2<T>& r) { return std::stov2<T>(l) / r; };
+template <typename T> inline vex2<T> operator*(const char* l, const vex2<T>& r) { return std::stov2<T>(l) * r; };
 
-inline vex3f operator+(const char* l, const vex3f& r) { return std::strtov3f(l) + r; };
-inline vex3f operator-(const char* l, const vex3f& r) { return std::strtov3f(l) - r; };
-inline vex3f operator/(const char* l, const vex3f& r) { return std::strtov3f(l) / r; };
-inline vex3f operator*(const char* l, const vex3f& r) { return std::strtov3f(l) * r; };
-inline vex3d operator+(const char* l, const vex3d& r) { return std::strtov3d(l) + r; };
-inline vex3d operator-(const char* l, const vex3d& r) { return std::strtov3d(l) - r; };
-inline vex3d operator/(const char* l, const vex3d& r) { return std::strtov3d(l) / r; };
-inline vex3d operator*(const char* l, const vex3d& r) { return std::strtov3d(l) * r; };
-inline vex3i operator+(const char* l, const vex3i& r) { return std::strtov3i(l) + r; };
-inline vex3i operator-(const char* l, const vex3i& r) { return std::strtov3i(l) - r; };
-inline vex3i operator/(const char* l, const vex3i& r) { return std::strtov3i(l) / r; };
-inline vex3i operator*(const char* l, const vex3i& r) { return std::strtov3i(l) * r; };
+template <typename T> inline vex3<T> operator+(const char* l, const vex3<T>& r) { return std::stov3<T>(l) + r; };
+template <typename T> inline vex3<T> operator-(const char* l, const vex3<T>& r) { return std::stov3<T>(l) - r; };
+template <typename T> inline vex3<T> operator/(const char* l, const vex3<T>& r) { return std::stov3<T>(l) / r; };
+template <typename T> inline vex3<T> operator*(const char* l, const vex3<T>& r) { return std::stov3<T>(l) * r; };
 
-inline vex4f operator+(const char* l, const vex4f& r) { return std::strtov4f(l) + r; };
-inline vex4f operator-(const char* l, const vex4f& r) { return std::strtov4f(l) - r; };
-inline vex4f operator/(const char* l, const vex4f& r) { return std::strtov4f(l) / r; };
-inline vex4f operator*(const char* l, const vex4f& r) { return std::strtov4f(l) * r; };
-inline vex4d operator+(const char* l, const vex4d& r) { return std::strtov4d(l) + r; };
-inline vex4d operator-(const char* l, const vex4d& r) { return std::strtov4d(l) - r; };
-inline vex4d operator/(const char* l, const vex4d& r) { return std::strtov4d(l) / r; };
-inline vex4d operator*(const char* l, const vex4d& r) { return std::strtov4d(l) * r; };
-inline vex4i operator+(const char* l, const vex4i& r) { return std::strtov4i(l) + r; };
-inline vex4i operator-(const char* l, const vex4i& r) { return std::strtov4i(l) - r; };
-inline vex4i operator/(const char* l, const vex4i& r) { return std::strtov4i(l) / r; };
-inline vex4i operator*(const char* l, const vex4i& r) { return std::strtov4i(l) * r; };
+template <typename T> inline vex4<T> operator+(const char* l, const vex4<T>& r) { return std::stov4<T>(l) + r; };
+template <typename T> inline vex4<T> operator-(const char* l, const vex4<T>& r) { return std::stov4<T>(l) - r; };
+template <typename T> inline vex4<T> operator/(const char* l, const vex4<T>& r) { return std::stov4<T>(l) / r; };
+template <typename T> inline vex4<T> operator*(const char* l, const vex4<T>& r) { return std::stov4<T>(l) * r; };
 
 template <typename T> inline vex2<T> operator+(const int& l, const vex2<T>& r) { return vex2<T>(l) + r; };
 template <typename T> inline vex2<T> operator-(const int& l, const vex2<T>& r) { return vex2<T>(l) - r; };
@@ -1487,4 +1273,5 @@ template <typename T> const T& max(const vex4<T>& v) { return (v.x > v.y && v.x 
 template <typename T> const T& min(const vex2<T>& v) { return (v.x < v.y) ? v.x : v.y; };
 template <typename T> const T& min(const vex3<T>& v) { return (v.x < v.y&& v.x < v.z) ? v.x : (v.y < v.z) ? v.y : v.z; };
 template <typename T> const T& min(const vex4<T>& v) { return (v.x < v.y&& v.x < v.z&& v.x < v.w) ? v.x : (v.y < v.z && v.y < v.w) ? v.y : (v.z < v.w) ? v.z : v.w; };
+#endif
 #endif

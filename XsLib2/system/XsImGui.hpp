@@ -94,10 +94,9 @@ namespace ImGui {
 		return b;
 	};
 };
-void XsInfo(XsTexture& v, const char* name = nullptr) {
-	if (name != nullptr) ImGui::Begin(name);
-	const vex2f _t = vex2f(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y).normalize();
-	ImGui::Image((void*)v.data, ImVec2(ImGui::GetWindowSize().x - 25, ImGui::GetWindowSize().x * _t.y - 25), ImVec2(0, 0), ImVec2(1, 1));
+void XsInfo(XsTexture& v, const std::string& name = "") {
+	if (!name.empty()) ImGui::Begin(name.c_str());
+	ImGui::Image((void*)v.data, ImVec2(ImGui::GetWindowSize().x - 25, ImGui::GetWindowSize().x * v3f(v.scale()).normalize().y - 25), ImVec2(0, 0), ImVec2(1, 1));
 	ImGui::Text(("File Name: "s + v.fileName).c_str());
 	ImGui::Text(("Size: X = "s + std::to_string(v.scale().x) + ", Y = " + std::to_string(v.scale().y)).c_str());
 	if (ImGui::Button("Load From File")) {
@@ -106,27 +105,29 @@ void XsInfo(XsTexture& v, const char* name = nullptr) {
 			v.load(s[0]);
 		};
 	};
-	if (name != nullptr) ImGui::End();
+	if (!name.empty()) ImGui::End();
 };
-void XsInfo(XsLight& v, const char* name = nullptr) {
-	if (name != nullptr) ImGui::Begin(name);
+void XsInfo(XsLight& v, const std::string& name = "") {
+	if (!name.empty()) ImGui::Begin(name.c_str());
 	ImGui::DragFloat3("Position", *v.pos, 0.01f, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat("Power", &v.power, 0.01f, -FLT_MAX, FLT_MAX);
 	ImGui::ColorPicker3("Color", *v.color);
-	if (name != nullptr) ImGui::End();
+	if (!name.empty()) ImGui::End();
 }
-void XsInfo(XsShape& v, const char* name = nullptr) {
-	if (name != nullptr) ImGui::Begin(name);
+void XsInfo(XsShape& v, const std::string& name = "") {
+	if (!name.empty()) ImGui::Begin((name+"##"+std::to_string(v.id)).c_str());
 	ImGui::DragFloat3("Position", *v.pos, 0.01f, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat3("Rotation", *v.rot, 0.1f, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat3("Scale", *v.scale, 0.01f, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat3("Origin", *v.origin, 0.01f, -FLT_MAX, FLT_MAX);
 	ImGui::ColorPicker4("Color", *v.color);
+	ImGui::Checkbox("Froze", &v.froze);
+	ImGui::Checkbox("Hide", &v.hide);
 	if (ImGui::TreeNode("Material")) {
-		ImGui::DragFloat3("Ambient", *v.material.ambient, 0.01f, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat3("Diffuse", *v.material.diffuse, 0.01f, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat3("Specular", *v.material.specular, 0.01f, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat("Shininess", &v.material.shininess, 0.01f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat3("Ambient", *v.ambient, 0.01f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat3("Diffuse", *v.diffuse, 0.01f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat3("Specular", *v.specular, 0.01f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("Shininess", &v.shininess, 0.01f, -FLT_MAX, FLT_MAX);
 		ImGui::TreePop();
 	};
 	if (ImGui::TreeNode("Texture")) {
@@ -177,7 +178,7 @@ void XsInfo(XsShape& v, const char* name = nullptr) {
 		};
 		ImGui::TreePop();
 	};
-	if (name != nullptr) ImGui::End();
+	if (!name.empty()) ImGui::End();
 };
 template <XsRigidType T>
 void XsInfo(XsRigid<T>& v, const char* name = nullptr) {

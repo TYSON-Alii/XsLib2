@@ -1,4 +1,4 @@
-class XsAnim {
+class XsAnim : public XsEntity {
 private:
     void gif_load(const std::string& filename) {
         EasyGifReader gifReader = EasyGifReader::openFile(filename.c_str());
@@ -11,7 +11,7 @@ private:
             t.loadFromMemory((void*)frame.pixels(), x, y, GL_RGBA, GL_UNSIGNED_BYTE);
             Frame(t);
         };
-    }
+    };
     XsChrono clk;
     std::vector<XsTexture> tex_data;
     XsTexture c_frame;
@@ -23,7 +23,7 @@ public:
     inline void Frame(XsTexture tex) { tex_data.push_back(tex); };
     inline XsTexture& Frame(const size_t& at) { return tex_data[at]; };
     inline XsTexture Frame(const size_t& at) const { return tex_data[at]; };
-    inline void Remove(const size_t& at) { tex_data.erase(tex_data.begin() + at); };
+    inline void Remove(const size_t& at) { tex_data.erase(tex_data.begin()+at); };
     inline void Clear() {
         clk.restart();
         current_index = 0;
@@ -31,7 +31,7 @@ public:
         tex_data.clear();
     };
     inline void Reset() {
-        if (!tex_data.empty())
+        if( !tex_data.empty() )
             c_frame = tex_data.front();
         else
             c_frame = XsTexture();
@@ -43,16 +43,16 @@ public:
     inline XsTexture& Current() { return c_frame; };
     inline XsTexture Current() const { return c_frame; };
     void Step() {
-        if (XsLimiter(clk, duration)) {
-            if (move_reverse) {
-                if (current_index == 0) current_index = tex_data.size();
+        if( XsLimiter(clk, duration) ) {
+            if( move_reverse ) {
+                if( current_index==0 ) current_index = tex_data.size();
                 current_index--;
                 c_frame = tex_data[current_index];
                 clk.restart();
             }
             else {
                 current_index++;
-                if (current_index == tex_data.size()) current_index = 0;
+                if( current_index==tex_data.size() ) current_index = 0;
                 c_frame = tex_data[current_index];
                 clk.restart();
             };

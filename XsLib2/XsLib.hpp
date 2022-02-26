@@ -1,14 +1,18 @@
+#ifndef _XSLIB2_
 #define _XSLIB2_
 #include <utility>
 #include <iostream>
+#include <typeinfo>
 #include <string>
 #include <Windows.h>
 #include <fstream>
 #include <format>
 #include <GL/glew.h>
+#define GLM_MESSAGES GLM_ENABLE
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
+//#include <gtc/matrix_transform.hpp>
+#include <ext.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
@@ -16,6 +20,11 @@
 #include <ImGui/imgui-SFML.h>
 #include <ImGui/imgui_stdlib.h>
 #include <ImGui/ImGuiFileDialog.h>
+#include <PxPhysXConfig.h>
+#include <PxShape.h>
+#include <PxRigidDynamic.h>
+#include <PxPhysics.h>
+#include <PxPhysicsAPI.h>
 #include <librarys/json.hpp>
 #include <librarys/magic_enum.hpp>
 #include <librarys/EasyGifReader.h>
@@ -25,17 +34,67 @@
 #include <ImGui-Vex.hpp>
 #include <Vex.hpp>
 #include <Random.hpp>
-#include <Utilityx.hpp>
 using namespace std::string_literals;
 using json = nlohmann::json;
 #define XS_PI 3.141592f
 #define XS_HALF_PI 1.570796f
 #define XS_TWO_PI 6.283185f
 #define XS_FI 1.618033f
+class XsEngine;
 struct XsMesh;
 struct XsVertex {
 	std::vector<vex3f> pos, normal;
 	std::vector<vex2f> tex;
+};
+namespace __xs_solid_meshs {
+	const std::vector<vex3f> cube_pos = {
+		{-1, -1, -1},{-1, 1, -1},{-1, -1, 1},{-1, -1, 1},{-1, 1, -1},{-1, 1, 1},
+		{1, -1, -1 },{1, 1, -1 },{1, -1, 1 },{1, -1, 1 },{1, 1, -1 },{1, 1, 1 },
+		{-1, -1, -1},{1, -1, -1},{-1, -1, 1},{-1, -1, 1},{1, -1, -1},{1, -1, 1},
+		{-1, 1, -1 },{1, 1, -1 },{-1, 1, 1 },{-1, 1, 1 },{1, 1, -1 },{1, 1, 1 },
+		{-1, -1, -1},{1, -1, -1},{-1, 1, -1},{-1, 1, -1},{1, -1, -1},{1, 1, -1},
+		{-1, -1, 1 },{1, -1, 1 },{-1, 1, 1 },{-1, 1, 1 },{1, -1, 1 },{1, 1, 1 }
+	};
+	const std::vector<vex2f> cube_tex = {
+		{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
+		{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
+		{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
+		{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
+		{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
+		{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1}
+	};
+	const std::vector<vex3f> cube_normal = {
+		{1, 0, 0 },{1, 0, 0 },{1, 0, 0 },{0, 0, -1 },{0, 0, -1 },{0, 0, -1 },
+		{-1, 0, 0},{-1, 0, 0},{-1, 0, 0},{0, -0, 1 },{0, -0, 1 },{0, -0, 1 },
+		{0, 1, 0 },{0, 1, 0 },{0, 1, 0 },{0, -1, -0},{0, -1, -0},{0, -1, -0},
+		{1, 0, 0 },{1, 0, 0 },{1, 0, 0 },{0, 0, -1 },{0, 0, -1 },{0, 0, -1 },
+		{-1, 0, 0},{-1, 0, 0},{-1, 0, 0},{0, -0, 1 },{0, -0, 1 },{0, -0, 1 },
+		{0, 1, 0 },{0, 1, 0 },{0, 1, 0 },{0, -1, -0},{0, -1, -0},{0, -1, -0}
+	};
+	const std::vector<vex3f> plane_pos = {
+		{  1, 0,  1 },
+		{ -1, 0, -1 },
+		{ -1, 0,  1 },
+		{  1, 0,  1 },
+		{  1, 0, -1 },
+		{ -1, 0, -1 }
+	};
+	const std::vector<vex2f> plane_tex = {
+		{ 1, 0 },
+		{ 0, 1 },
+		{ 0, 0 },
+		{ 1, 0 },
+		{ 1, 1 },
+		{ 0, 1 }
+	};
+	const std::vector<vex3f> plane_normal = {
+		{ 0, 1, 0 },
+		{ 0, 1, 0 },
+		{ 0, 1, 0 },
+		{ 0, 1, 0 },
+		{ 0, 1, 0 },
+		{ 0, 1, 0 }
+	};
 };
 typedef unsigned int XsTexData;
 struct {
@@ -213,58 +272,8 @@ struct {
 		const char* PolyNames[5]{ "Point", "Line", "Triangle", "Quad", "Polygon"};
 	} Values;
 	struct {
-		struct {
-			const std::vector<vex3f> __cube_pos = {
-				{-1, -1, -1},{-1, 1, -1},{-1, -1, 1},{-1, -1, 1},{-1, 1, -1},{-1, 1, 1},
-				{1, -1, -1 },{1, 1, -1 },{1, -1, 1 },{1, -1, 1 },{1, 1, -1 },{1, 1, 1 },
-				{-1, -1, -1},{1, -1, -1},{-1, -1, 1},{-1, -1, 1},{1, -1, -1},{1, -1, 1},
-				{-1, 1, -1 },{1, 1, -1 },{-1, 1, 1 },{-1, 1, 1 },{1, 1, -1 },{1, 1, 1 },
-				{-1, -1, -1},{1, -1, -1},{-1, 1, -1},{-1, 1, -1},{1, -1, -1},{1, 1, -1},
-				{-1, -1, 1 },{1, -1, 1 },{-1, 1, 1 },{-1, 1, 1 },{1, -1, 1 },{1, 1, 1 }
-			};
-			const std::vector<vex2f> __cube_tex = {
-				{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
-				{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
-				{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
-				{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
-				{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1},
-				{0, 0},{1, 0},{0, 1},{0, 1},{1, 0},{1, 1}
-			};
-			const std::vector<vex3f> __cube_normal = {
-				{1, 0, 0 },{1, 0, 0 },{1, 0, 0 },{0, 0, -1 },{0, 0, -1 },{0, 0, -1 },
-				{-1, 0, 0},{-1, 0, 0},{-1, 0, 0},{0, -0, 1 },{0, -0, 1 },{0, -0, 1 },
-				{0, 1, 0 },{0, 1, 0 },{0, 1, 0 },{0, -1, -0},{0, -1, -0},{0, -1, -0},
-				{1, 0, 0 },{1, 0, 0 },{1, 0, 0 },{0, 0, -1 },{0, 0, -1 },{0, 0, -1 },
-				{-1, 0, 0},{-1, 0, 0},{-1, 0, 0},{0, -0, 1 },{0, -0, 1 },{0, -0, 1 },
-				{0, 1, 0 },{0, 1, 0 },{0, 1, 0 },{0, -1, -0},{0, -1, -0},{0, -1, -0}
-			};
-			const std::vector<vex3f> __plane_pos = {
-				{  1, 0,  1 },
-				{ -1, 0, -1 },
-				{ -1, 0,  1 },
-				{  1, 0,  1 },
-				{  1, 0, -1 },
-				{ -1, 0, -1 }
-			};
-			const std::vector<vex2f> __plane_tex = {
-				{ 1, 0 },
-				{ 0, 1 },
-				{ 0, 0 },
-				{ 1, 0 },
-				{ 1, 1 },
-				{ 0, 1 }
-			};
-			const std::vector<vex3f> __plane_normal = {
-				{ 0, 1, 0 },
-				{ 0, 1, 0 },
-				{ 0, 1, 0 },
-				{ 0, 1, 0 },
-				{ 0, 1, 0 },
-				{ 0, 1, 0 }
-			};
-		} Meta;
-		const XsVertex Cube = { Meta.__cube_pos, Meta.__cube_normal, Meta.__cube_tex };
-		const XsVertex Plane = {Meta.__plane_pos, Meta.__plane_normal, Meta.__plane_tex };
+		const XsVertex Cube = { __xs_solid_meshs::cube_pos, __xs_solid_meshs::cube_normal, __xs_solid_meshs::cube_tex };
+		const XsVertex Plane = { __xs_solid_meshs::plane_pos, __xs_solid_meshs::plane_normal, __xs_solid_meshs::plane_tex };
 	} Mesh;
 	sf::Event Event;
 	XsMesh LoadOBJ(const std::string& filename);
@@ -283,7 +292,20 @@ struct {
 } Xs;
 typedef decltype(decltype(Xs)::Enum)::Enum_t XsEnum;
 typedef decltype(decltype(Xs)::Key)::Key_t XsKey;
-struct XsMesh : public XsVertex {
+using id_t = unsigned long long;
+class XsEntity {
+public:
+	XsEntity(const std::string& _tag = "") : tag(_tag) { };
+	//~XsEntity();
+	//void destroy();
+	virtual const type_info& info() { return typeid(*this); };
+	virtual void start() { };
+	virtual void loop() { };
+	id_t id;
+	std::string tag;
+private:
+};
+struct XsMesh : public XsEntity, public XsVertex {
 	XsMesh() = default;
 	XsMesh(const XsMesh&) = default;
 	XsMesh(XsVertex v) {
@@ -393,7 +415,7 @@ static sf::ContextSettings contextSettings = sf::ContextSettings(24,8,0,3,3,fals
 sf::Context context;
 static sf::Clock __IMCLOCK__;
 static auto _XS_FPS_START = std::chrono::high_resolution_clock::now();
-static const bool _xs_init = glewInit();
+static const bool& _xs_init = [&]() -> bool { glewInit(); return true; }();
 
 #include <system/XsClock.hpp>
 
@@ -450,107 +472,17 @@ static bool __FxsIm = true;
 #define ImBlock(_Window) for([&](){ ImGui::SFML::Update(_Window, __IMCLOCK__.restart()); __FxsIm = true; }();__FxsIm;[&](){ _Window.pushGLStates(); ImGui::SFML::Render(_Window); _Window.popGLStates(); __FxsIm = false;}())
 
 #include <Engine/XsEngine.hpp>
-
-void XsShape::draw(XsEngine* eng) {
-	loop();
-	limit(rot, 0.f, 360.f, true);
-	eng->shader("model", matrix());
-	eng->shader("material.ambient", material.ambient);
-	eng->shader("material.diffuse", material.diffuse);
-	eng->shader("material.specular", material.specular);
-	eng->shader("material.shininess", material.shininess);
-	eng->shader("color", color);
-	if (mesh != nullptr) {
-		if (tex != nullptr)
-			tex->bind();
-		else
-			glBindTexture(GL_TEXTURE_2D, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(vex3f), &mesh->pos[0]);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vex3f), &mesh->pos[0]);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(vex2f), &mesh->tex[0]);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(vex2f), &mesh->tex[0]);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, sizeof(vex3f), &mesh->normal[0]);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, false, sizeof(vex3f), &mesh->normal[0]);
-		glDrawArrays(mesh->poly, 0, mesh->pos.size());
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-	};
-};
-void XsRigid<XsDynamic>::draw(XsEngine* eng) {
-	loop();
-	eng->shader("model", matrix());
-	eng->shader("material.ambient", material.ambient);
-	eng->shader("material.diffuse", material.diffuse);
-	eng->shader("material.specular", material.specular);
-	eng->shader("material.shininess", material.shininess);
-	eng->shader("color", color);
-	if (mesh != nullptr) {
-		if (tex != nullptr)
-			tex->bind();
-		else
-			glBindTexture(GL_TEXTURE_2D, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(vex3f), &mesh->pos[0]);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vex3f), &mesh->pos[0]);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(vex2f), &mesh->tex[0]);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(vex2f), &mesh->tex[0]);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, sizeof(vex3f), &mesh->normal[0]);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, false, sizeof(vex3f), &mesh->normal[0]);
-		glDrawArrays(mesh->poly, 0, mesh->pos.size());
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-	};
-};
-void XsRigid<XsStatic>::draw(XsEngine* eng) {
-	loop();
-	eng->shader("model", matrix());
-	eng->shader("material.ambient", material.ambient);
-	eng->shader("material.diffuse", material.diffuse);
-	eng->shader("material.specular", material.specular);
-	eng->shader("material.shininess", material.shininess);
-	eng->shader("color", color);
-	if (mesh != nullptr) {
-		if (tex != nullptr)
-			tex->bind();
-		else
-			glBindTexture(GL_TEXTURE_2D, 0);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(vex3f), &mesh->pos[0]);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vex3f), &mesh->pos[0]);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(vex2f), &mesh->tex[0]);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(vex2f), &mesh->tex[0]);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, sizeof(vex3f), &mesh->normal[0]);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, false, sizeof(vex3f), &mesh->normal[0]);
-		glDrawArrays(mesh->poly, 0, mesh->pos.size());
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-	};
-};
+using Engine = XsEngine;
+using Entity = XsEntity;
+using Shape = XsShape;
+using Transform = XsTransform;
+using Material = XsMaterial;
+using Texture = XsTexture;
+using Anim = XsAnim;
+using Mesh = XsMesh;
+using Vertex = XsVertex;
+using Light = XsLight;
+using Shader = XsShader;
+using Camera = XsCamera;
+using Chrono = XsChrono;
+#endif

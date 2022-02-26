@@ -1,13 +1,8 @@
-#include <PxPhysXConfig.h>
-#include <PxShape.h>
-#include <PxRigidDynamic.h>
-#include <PxPhysics.h>
-#include <PxPhysicsAPI.h>
 namespace px = physx;
 px::PxTriangleMeshGeometry* XsPxTriangleMesh(const XsMesh& mesh);
 enum XsRigidType { XsDynamic, XsStatic };
 template <XsRigidType> class XsRigid;
-template <> class XsRigid<XsDynamic> {
+template <> class XsRigid<XsDynamic> : public XsMaterial {
 private:
     px::PxShape* sh;
     px::PxRigidDynamic* bd;
@@ -16,14 +11,12 @@ private:
     vex3b a_lockAxis = false;
 public:
     XsRigid(px::PxGeometry* geom, vex3f mat);
-    XsMaterial material;
     XsMesh* mesh = nullptr;
     XsTexture* tex = nullptr;
     vex3f scale = 1.f, origin = 0.f;
-    vex4f color = 1.f;
-    vex3b lockLinAxis() const { return l_lockAxis; };
-    vex3b lockAngAxis() const { return a_lockAxis; };
-    vex3b lockLinAxis(const vex3b& axis_xyz) {
+    inline vex3b lockLinAxis() const { return l_lockAxis; };
+    inline vex3b lockAngAxis() const { return a_lockAxis; };
+    inline vex3b lockLinAxis(const vex3b& axis_xyz) {
         if (axis_xyz.x)
             bd->setRigidDynamicLockFlag(px::PxRigidDynamicLockFlag::eLOCK_LINEAR_X, true);
         if (axis_xyz.y)
@@ -32,7 +25,7 @@ public:
             bd->setRigidDynamicLockFlag(px::PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, true);
         return l_lockAxis = axis_xyz;
     };
-    vex3b lockAngAxis(const vex3b& axis_xyz) {
+    inline vex3b lockAngAxis(const vex3b& axis_xyz) {
         if (axis_xyz.x)
             bd->setRigidDynamicLockFlag(px::PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
         if (axis_xyz.y)
@@ -41,11 +34,13 @@ public:
             bd->setRigidDynamicLockFlag(px::PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, true);
         return l_lockAxis = axis_xyz;
     };
-    auto operator*() { return this; };
+    inline vex3f mass() const { return bd->getMass(); };
+    inline vex3f mass(const float& v) { bd->setMass(v); return mass(); };
+    inline auto operator*() { return this; };
     inline vex3f pos() const { return vex3f(bd->getGlobalPose().p.x, bd->getGlobalPose().p.y, bd->getGlobalPose().p.z); };
     inline vex3f pos(const vex3f& v) { bd->setGlobalPose(px::PxTransform(v.x, v.y, v.z)); return v; };
     inline vex3f pos(const float& v_x, const float& v_y, const float& v_z) { bd->setGlobalPose(px::PxTransform(v_x, v_y, v_z)); return vex3f(v_x, v_y, v_z); };
-    vex3f rot() { return vex3f(bd->getGlobalPose().q.rotate(px::PxVec3(1)).x, bd->getGlobalPose().q.rotate(px::PxVec3(1)).y, bd->getGlobalPose().q.rotate(px::PxVec3(1)).z); };
+    inline vex3f rot() { return vex3f(bd->getGlobalPose().q.rotate(px::PxVec3(1)).x, bd->getGlobalPose().q.rotate(px::PxVec3(1)).y, bd->getGlobalPose().q.rotate(px::PxVec3(1)).z); };
     inline void force(const vex3f& v) { bd->addForce(px::PxVec3(v.x,v.y,v.z),px::PxForceMode::eACCELERATION); };
     inline void hit(const vex3f& v) { bd->addForce(px::PxVec3(v.x, v.y, v.z), px::PxForceMode::eIMPULSE); }
     inline vex3f velLin() const { return vex3f(bd->getLinearVelocity().x, bd->getLinearVelocity().y, bd->getLinearVelocity().z); };
@@ -67,18 +62,16 @@ public:
     };
     void draw(XsEngine* eng);
 };
-template <> class XsRigid<XsStatic> {
+template <> class XsRigid<XsStatic> : public XsMaterial {
 private:
     px::PxShape* sh;
     px::PxRigidStatic* bd;
     px::PxMaterial* mt;
 public:
     XsRigid(px::PxGeometry* geom, vex3f mat);
-    XsMaterial material;
     XsMesh* mesh = nullptr;
     XsTexture* tex = nullptr;
     vex3f scale = 1.f, origin = 0.f;
-    vex4f color = 1.f;
     auto operator*() { return this; };
     inline vex3f pos() const { return vex3f(bd->getGlobalPose().p.x, bd->getGlobalPose().p.y, bd->getGlobalPose().p.z); };
     inline vex3f pos(const vex3f& v) { bd->setGlobalPose(px::PxTransform(v.x, v.y, v.z)); return v; };
