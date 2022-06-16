@@ -18,10 +18,8 @@
 ### Code View
 ```cpp
 #include <XsLib.hpp>
-#include <Utilityx.hpp>
-namespace im = ImGui;
-#define win ::eng.Window
-#define cam ::eng.Cam
+var win = eng.Window;
+var cam = eng.Cam;
 var kayatex = eng.create(new Texture("data/kayadam.png"));
 var kayavert = eng.create(new Mesh(Xs.LoadOBJ("data/kayadam.obj")));
 class Kayadam : public Shape {
@@ -37,9 +35,9 @@ public:
     Chrono life_time;
     void controller() {
         vel.y -= 0.001f;
-        if(Xs.KeyPressed(Xs.Key.Space))
+        if(Xs.Key.Pressed(Xs.Key.Space))
             vel.y += 0.005f;
-        if (eng.shapes.back().value->id == id and Xs.KeyPressed(Xs.Mouse.Button.Left))
+        if (eng.shapes.back().value->id == id and Xs.Key.Pressed(Xs.Mouse.Left))
             vel = (pos - (cam.pos + cam.rot * 10.f)) * (Xs.Math.Distance(pos, cam.pos) / -100.f);
     };
     void physics() {
@@ -50,40 +48,51 @@ public:
     void loop() {
         controller();
         physics();
+        // if (life_time.getMilliSeconds() > 4.f) destroy();
     };
 };
-auto main() -> int {
-    var kameram = eng.Cam;
-    kameram.pos = vex3f(20.f, 20.f, 0.f);
-    var floor = eng.create(new Shape());
-    var kayadam = eng.create(new Kayadam("tasak"));
-    var plane = eng.create(new Mesh(Xs.LoadOBJ("data/fena.obj")));
-    floor.scale = 75;
-    floor.mesh = &plane;
-    var anim = eng.create(new Anim());
+var yer = eng.create(new Shape());
+var kayadam = eng.create(new Kayadam("first kayadam"));
+var plane = eng.create(new Mesh(Xs.LoadOBJ("data/fena.obj")));
+var anim = eng.create(new Anim());
+var light0 = eng.create(new Light({ 15,15,15 }, 255));
+var light1 = eng.create(new Light({ -15,15,-15 }, { 100,25,220 }, 1000.f));
+Chrono spawn_timer;
+int counter = 0;
+
+void XsEngine::init() {
+    cam.pos = vex3f(20.f, 20.f, 0.f);
     anim.loadFromGIF("data/fizbuz.gif");
-    floor.tex = &anim.Current();
+    yer.scale = 75;
+    yer.mesh = &plane;
+    yer.tex = &anim.current();
     Xs.Editor.Cam.Speed_v = 0.03f;
-    var light0 = eng.create(new Light({ 15,15,15 }, { 1,1,1 }));
-    var light1 = eng.create(new Light({ -15,15,-15 }, { 0.4,0.1,0.8 }, 1000.f));
-    Chrono spawn_timer;
-    int counter = 0;
-    XsStart(eng, "HELLO WORLD !!") {
-        Once(im::StyleXsDark())
-        kameram.viewport << win.getSize();
-        XsEditorCamera(kameram);
-        light1.pos = cam.pos+cam.rot*10;
-        if (Xs.KeyPressed(Xs.Key.Q) and XsLimiter(spawn_timer, 1)) {
-            eng.create(new Kayadam("tasak "s+to_string(counter++)));
-        };
-        eng.play();
-        if (Xs.KeyPressed(Xs.Key.Space))
-            echo eng.shapes.size() << '\n';
-        ImBlock(win) {
-            XsInfo(floor, "roomke");
-            XsInfo(light0, "light0");
-            XsInfo(light1, "light1");
-        }
+}
+
+void XsEngine::loop() {
+    Once(im::StyleXsDark());
+    cam.editor();
+    light1.pos = cam.pos + cam.rot * 10;
+    if (Xs.Limiter(spawn_timer, 0.3f) and Xs.Key.Pressed(Xs.Key.Q)) {
+        eng.create(new Kayadam("kayadam "s + to_string(counter++)));
     };
+    if (Xs.Key.Pressed(Xs.Key.Space))
+        cout << eng.shapes.size() << '\n';
+}
+
+void XsEngine::shutdown() {
+    echo "program end.\n";
+}
+
+void XsEngine::gui() {
+    Xs.Info(yer, "floor");
+    Xs.Info(light1, "light1");
+}
+
+auto main() -> int {
+    str win_name;
+    cout << "app name: ";
+    std::cin >> win_name;
+    eng.play(win_name);
 };
 ```
